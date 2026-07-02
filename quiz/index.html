@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAWA Quiz — Who Am I?</title>
+    <meta name="description" content="Daily Northern Ireland football quiz. Five clues. One player. Can you guess who it is?">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pitch:       #081F12;
+            --card:        #0D2E1A;
+            --card-border: #1C4A2A;
+            --clue-bg:     #0A2516;
+            --green:       #22C55E;
+            --green-mid:   #16A34A;
+            --gold:        #F59E0B;
+            --white:       #F1F5F0;
+            --muted:       #4D7A5E;
+            --wrong:       #EF4444;
+            --text:        #CBD5CB;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--pitch);
+            color: var(--text);
+            font-family: 'Inter', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 28px 16px 60px;
+        }
+
+        /* ── Header ── */
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .eyebrow {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 12px;
+            letter-spacing: 5px;
+            color: var(--gold);
+            margin-bottom: 2px;
+        }
+
+        .title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 56px;
+            line-height: 1;
+            color: var(--white);
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 460px;
+            overflow: visible;
+        }
+
+        /* ── Progress dots ── */
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px 24px 0;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--card-border);
+            transition: background 0.4s, transform 0.2s;
+        }
+
+        .dot.revealed { background: var(--muted); }
+        .dot.correct  { background: var(--green); transform: scale(1.2); }
+        .dot.wrong    { background: var(--wrong); }
+
+        /* ── Clues ── */
+        .clues-section { padding: 20px 24px 0; }
+
+        .section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .clues-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .clue-empty {
+            font-size: 14px;
+            color: var(--muted);
+            padding: 6px 0 4px;
+            font-style: italic;
+        }
+
+        .clue-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: var(--clue-bg);
+            border-left: 3px solid var(--green);
+            border-radius: 10px;
+            padding: 13px 16px;
+            animation: clueIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes clueIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .clue-n {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 20px;
+            color: var(--green);
+            line-height: 1.2;
+            flex-shrink: 0;
+            width: 18px;
+        }
+
+        .clue-text {
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--white);
+        }
+
+        /* ── Reveal button ── */
+        .reveal-btn {
+            display: block;
+            width: calc(100% - 48px);
+            margin: 16px 24px;
+            padding: 13px;
+            background: transparent;
+            border: 1px dashed var(--card-border);
+            border-radius: 10px;
+            color: var(--muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            letter-spacing: 0.3px;
+        }
+
+        .reveal-btn:hover:not(:disabled) {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .reveal-btn:disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            height: 1px;
+            background: var(--card-border);
+            margin: 0 24px;
+        }
+
+        /* ── Guess section ── */
+        .guess-section { padding: 18px 24px 24px; }
+
+        .guess-wrapper { position: relative; }
+
+        .guess-input {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--clue-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .guess-input:focus { border-color: var(--green); }
+        .guess-input::placeholder { color: var(--muted); }
+
+        .autocomplete {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0; right: 0;
+            background: #142D1C;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            max-height: 210px;
+            overflow-y: auto;
+            z-index: 200;
+            display: none;
+        }
+
+        .autocomplete.open { display: block; }
+
+        .ac-item {
+            padding: 11px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--text);
+            border-radius: 8px;
+            margin: 3px;
+            transition: background 0.12s;
+        }
+
+        .ac-item:hover, .ac-item.hi {
+            background: var(--card-border);
+            color: var(--white);
+        }
+
+        .wrong-msg {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.25);
+            border-radius: 8px;
+            font-size: 13px;
+            color: #FCA5A5;
+        }
+
+        .wrong-msg.show { display: flex; }
+
+        .remaining {
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 10px;
+            min-height: 18px;
+        }
+
+        .guess-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 14px;
+            background: var(--green-mid);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            letter-spacing: 0.2px;
+        }
+
+        .guess-btn:hover:not(:disabled) { background: var(--green); }
+        .guess-btn:disabled { opacity: 0.35; cursor: default; }
+
+        /* ── Result ── */
+        .result-section {
+            display: none;
+            padding: 28px 24px 28px;
+            text-align: center;
+        }
+
+        .result-section.show { display: block; }
+
+        .result-emoji { font-size: 52px; margin-bottom: 14px; }
+
+        .result-heading {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 38px;
+            color: var(--white);
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .result-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 6px;
+        }
+
+        .result-score {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 24px;
+        }
+
+        .tm-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 11px 20px;
+            background: transparent;
+            border: 1px solid var(--card-border);
+            border-radius: 9px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 14px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .tm-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .share-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--gold);
+            border: none;
+            border-radius: 10px;
+            color: #111;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            letter-spacing: 0.2px;
+        }
+
+        .share-btn:hover { opacity: 0.88; }
+
+        .share-msg {
+            font-size: 12px;
+            color: var(--green);
+            margin-top: 10px;
+            min-height: 18px;
+            font-weight: 500;
+        }
+
+        /* ── Footer ── */
+        footer {
+            margin-top: 28px;
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .clue-item { animation: none; }
+            .dot { transition: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="eyebrow">Green &amp; White Army</div>
+    <div class="title">GAWA QUIZ</div>
+    <div class="subtitle" id="quizLabel">Who Am I?</div>
+</header>
+
+<div class="card">
+
+    <div class="dots" id="dots">
+        <div class="dot" id="d1"></div>
+        <div class="dot" id="d2"></div>
+        <div class="dot" id="d3"></div>
+        <div class="dot" id="d4"></div>
+        <div class="dot" id="d5"></div>
+    </div>
+
+    <div class="clues-section">
+        <div class="section-label">Clues</div>
+        <div class="clues-list" id="cluesList">
+            <div class="clue-empty" id="clueEmpty">Reveal your first clue to begin…</div>
+        </div>
+    </div>
+
+    <button class="reveal-btn" id="revealBtn" onclick="revealClue()">
+        + Reveal next clue
+    </button>
+
+    <div class="divider"></div>
+
+    <div class="guess-section" id="guessSection">
+        <div class="section-label">Your Guess</div>
+        <div class="guess-wrapper">
+            <input
+                id="guessInput"
+                class="guess-input"
+                type="text"
+                placeholder="Type a player name…"
+                autocomplete="off"
+                spellcheck="false"
+                oninput="onInput()"
+                onkeydown="onKey(event)"
+            />
+            <div class="autocomplete" id="acList"></div>
+        </div>
+        <div class="wrong-msg" id="wrongMsg">
+            <span>✗</span><span id="wrongText">Not quite — try again or reveal another clue</span>
+        </div>
+        <div class="remaining" id="remaining"></div>
+        <button class="guess-btn" id="guessBtn" onclick="guess()" disabled>
+            Submit Guess
+        </button>
+    </div>
+
+    <div class="result-section" id="resultSection">
+        <div class="result-emoji" id="resultEmoji"></div>
+        <div class="result-heading" id="resultHeading"></div>
+        <div class="result-name" id="resultName"></div>
+        <div class="result-score" id="resultScore"></div>
+        <a class="tm-btn" id="tmLink" href="#" target="_blank" rel="noopener noreferrer">
+            ⚽ View on Transfermarkt
+        </a>
+        <button class="share-btn" onclick="share()">Share Result</button>
+        <div class="share-msg" id="shareMsg"></div>
+    </div>
+
+</div>
+
+<footer>A new player every day · <span id="footerNum"></span></footer>
+
+<script>
+// ── Data injected by build script ────────────────────────────────────────────
+const QUIZ          = {"quiz_number": 1, "tm_player_id": "62052", "player_name": "Shane Ferguson", "clues": ["My initials are S.F.", "I currently play for Morpeth Town", "I made my senior NI debut in 2009", "I have 57 senior caps for Northern Ireland", "I have scored 2 senior international goal(s)"], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/62052"};
+const PLAYER_NAMES  = ["Aaron Donnelly", "Adam Barton", "Adam Thompson", "Alfie McCalmont", "Ali McCann", "Bailey Peacock-Farrell", "Ben Reeves", "Billy McKay", "Brad Lyons", "Braiden Graham", "Brodie Spencer", "Callum Marshall", "Cameron McGeehan", "Caolan Boyd-Munce", "Carl Winchester", "Ceadach O'Neill", "Chris Casement", "Ciaron Brown", "Conor Bradley", "Conor Hazard", "Conor McMenamin", "Conor Washington", "Dale Taylor", "Daniel Ballard", "Danny Lafferty", "Darren Robinson", "Devlan Moses", "Dion Charles", "Eoin Toal", "Ethan Galbraith", "Gary Hamilton", "Gavin Whyte", "George Saville", "Isaac Price", "Ivan Sproule", "Jamal Lewis", "James Lawrie", "James McClean", "Jamie Donley", "Jamie McDonnell", "Jamie Mulgrew", "Jamie Reid", "Jamie Ward", "Jonny Russell", "Jonny Tuffey", "Jordan Jones", "Jordan Owens", "Jordan Thompson", "Josh Carson", "Josh Clarke", "Josh Magennis", "Josh McQuoid", "Justin Devenny", "Kieran Morrison", "Kyle Lafferty", "Kyle Vassell", "Lee Bonis", "Lee Hodson", "Lee McEvilly", "Liam Boyce", "Liam Donnelly", "Luke McCullough", "Luke Southwood", "Makenzie Kirk", "Marty Donnelly", "Matty Kennedy", "Michael Bryan", "Michael Forbes", "Michael Smith", "Niall McGinn", "Oliver Norwood", "Paddy Lane", "Paddy McNair", "Patrick Kelly", "Paul Paton", "Paul Smyth", "Peter Thompson", "Pierce Charles", "Robert Garrett", "Ronan Hale", "Rory Patterson", "Ross McCausland", "Ruairi McConville", "Ryan Johnson", "Ryan McLaughlin", "Sam McClelland", "Seán Webb", "Shane Duffy", "Shane Ferguson", "Shay McCartan", "Shayne Lavery", "Shea Charles", "Terry Devlin", "Tom Atcheson", "Tom Flanagan", "Trai Hume", "Trevor Carson", "Will Grigg"];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let revealed  = 0;          // clues shown so far
+let done      = false;      // game over flag
+let picked    = '';         // currently selected autocomplete name
+let acIdx     = -1;         // keyboard nav index in autocomplete
+let dotState  = new Array(5).fill('');  // '' | 'revealed' | 'correct' | 'wrong'
+
+const MAX = QUIZ.clues.length;  // always 5
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+document.getElementById('quizLabel').textContent  = `Quiz #${QUIZ.quiz_number} · Who Am I?`;
+document.getElementById('footerNum').textContent  = `Quiz #${QUIZ.quiz_number}`;
+updateRemaining();
+
+// ── Clue reveal ───────────────────────────────────────────────────────────────
+function revealClue() {
+    if (done || revealed >= MAX) return;
+
+    const list  = document.getElementById('cluesList');
+    const empty = document.getElementById('clueEmpty');
+    if (empty) empty.remove();
+
+    const clue = QUIZ.clues[revealed];
+    const el   = document.createElement('div');
+    el.className = 'clue-item';
+    el.innerHTML = `<span class="clue-n">${revealed + 1}</span><span class="clue-text">${clue}</span>`;
+    list.appendChild(el);
+
+    dotState[revealed] = 'revealed';
+    revealed++;
+    renderDots();
+    updateRemaining();
+
+    document.getElementById('guessBtn').disabled  = false;
+    document.getElementById('wrongMsg').classList.remove('show');
+
+    if (revealed >= MAX) {
+        const btn = document.getElementById('revealBtn');
+        btn.disabled    = true;
+        btn.textContent = 'All clues revealed';
+    }
+}
+
+// ── Autocomplete ──────────────────────────────────────────────────────────────
+function onInput() {
+    picked = '';
+    acIdx  = -1;
+    const q = document.getElementById('guessInput').value.trim().toLowerCase();
+
+    if (q.length < 2) { closeAc(); return; }
+
+    const hits = PLAYER_NAMES.filter(n => n.toLowerCase().includes(q)).slice(0, 8);
+    if (!hits.length) { closeAc(); return; }
+
+    const ac = document.getElementById('acList');
+    ac.innerHTML = hits.map(n =>
+        `<div class="ac-item" data-n="${n}" onmousedown="pickAc('${n.replace(/'/g,"\\'")}')">${n}</div>`
+    ).join('');
+    ac.classList.add('open');
+}
+
+function pickAc(name) {
+    document.getElementById('guessInput').value = name;
+    picked = name;
+    closeAc();
+}
+
+function closeAc() {
+    const ac = document.getElementById('acList');
+    ac.classList.remove('open');
+    ac.innerHTML = '';
+}
+
+function onKey(e) {
+    const items = document.getElementById('acList').querySelectorAll('.ac-item');
+    if (e.key === 'ArrowDown')  { acIdx = Math.min(acIdx + 1, items.length - 1); hiAc(items); }
+    else if (e.key === 'ArrowUp')   { acIdx = Math.max(acIdx - 1, -1);              hiAc(items); }
+    else if (e.key === 'Enter') {
+        if (acIdx >= 0 && items[acIdx]) pickAc(items[acIdx].dataset.n);
+        else guess();
+    }
+    else if (e.key === 'Escape') closeAc();
+}
+
+function hiAc(items) {
+    items.forEach((el, i) => {
+        el.classList.toggle('hi', i === acIdx);
+        if (i === acIdx) picked = el.dataset.n;
+    });
+}
+
+// ── Guess ─────────────────────────────────────────────────────────────────────
+function guess() {
+    if (done || revealed === 0) return;
+
+    const raw     = (picked || document.getElementById('guessInput').value.trim());
+    if (!raw) return;
+
+    const correct = raw.toLowerCase() === QUIZ.player_name.toLowerCase();
+    closeAc();
+
+    if (correct) {
+        dotState[revealed - 1] = 'correct';
+        renderDots();
+        endGame(true);
+    } else {
+        dotState[revealed - 1] = 'wrong';
+        renderDots();
+
+        const msg = document.getElementById('wrongMsg');
+        msg.classList.add('show');
+        document.getElementById('wrongText').textContent = revealed < MAX
+            ? 'Not quite — try again or reveal another clue'
+            : 'That\'s not right — see the answer below';
+
+        document.getElementById('guessInput').value = '';
+        picked = '';
+
+        if (revealed >= MAX) endGame(false);
+    }
+}
+
+// ── End game ──────────────────────────────────────────────────────────────────
+function endGame(won) {
+    done = true;
+    document.getElementById('guessSection').style.display  = 'none';
+    document.getElementById('revealBtn').style.display      = 'none';
+
+    const sec = document.getElementById('resultSection');
+    sec.classList.add('show');
+
+    document.getElementById('resultEmoji').textContent   = won ? '🟢' : '⚪';
+    document.getElementById('resultHeading').textContent = won ? 'Got it!' : 'Unlucky!';
+    document.getElementById('resultName').textContent    = QUIZ.player_name;
+    document.getElementById('resultScore').textContent   = won
+        ? `Identified after ${revealed} clue${revealed !== 1 ? 's' : ''}`
+        : 'Better luck tomorrow';
+
+    document.getElementById('tmLink').href = QUIZ.transfermarkt_url || '#';
+
+    // Fill remaining dots as revealed (no outcome)
+    dotState = dotState.map((s, i) => (i < revealed && s === 'revealed') ? 'revealed' : s);
+    renderDots();
+}
+
+// ── Share ─────────────────────────────────────────────────────────────────────
+function share() {
+    const won   = document.getElementById('resultHeading').textContent === 'Got it!';
+    const emoji = dotState.slice(0, revealed).map(s => {
+        if (s === 'correct')  return '🟢';
+        if (s === 'wrong')    return '🔴';
+        return '⬜';
+    }).join('');
+
+    const scoreText = won
+        ? `Identified in ${revealed}/5 clues`
+        : 'Didn\'t get today\'s player';
+
+    const text = [
+        `GAWA Quiz #${QUIZ.quiz_number} — Who Am I?`,
+        emoji,
+        scoreText,
+        'https://gawa-quiz.github.io/'
+    ].join('\n');
+
+    if (navigator.share) {
+        navigator.share({ text }).catch(() => copyText(text));
+    } else {
+        copyText(text);
+    }
+}
+
+function copyText(t) {
+    navigator.clipboard.writeText(t).then(() => {
+        const el = document.getElementById('shareMsg');
+        el.textContent = '✓ Copied to clipboard';
+        setTimeout(() => el.textContent = '', 3000);
+    });
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function renderDots() {
+    [1,2,3,4,5].forEach(i => {
+        document.getElementById(`d${i}`).className = `dot ${dotState[i-1]}`.trim();
+    });
+}
+
+function updateRemaining() {
+    const el   = document.getElementById('remaining');
+    const left = MAX - revealed;
+    el.textContent = revealed === 0
+        ? 'Reveal at least one clue before guessing'
+        : left > 0
+            ? `${left} clue${left !== 1 ? 's' : ''} remaining`
+            : 'All clues revealed';
+}
+</script>
+
+</body>
+</html>
