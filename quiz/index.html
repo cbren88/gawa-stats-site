@@ -6,20 +6,20 @@
     <title>GAWA Quiz — Who Am I?</title>
     <meta name="description" content="Daily Northern Ireland football quiz. Five clues. One player. Can you guess who it is?">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --pitch:       #081F12;
-            --card:        #0D2E1A;
-            --card-border: #1C4A2A;
-            --clue-bg:     #0A2516;
-            --green:       #22C55E;
-            --green-mid:   #16A34A;
+            --pitch:       #FFFFFF;
+            --card:        #F8F8F8;
+            --card-border: #D8D8D8;
+            --clue-bg:     #F0F4F2;
+            --green:       #2D9858;
+            --green-mid:   #237A46;
             --gold:        #F59E0B;
-            --white:       #F1F5F0;
-            --muted:       #4D7A5E;
+            --white:       #111111;
+            --muted:       #777777;
             --wrong:       #EF4444;
-            --text:        #CBD5CB;
+            --text:        #333333;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -42,19 +42,21 @@
         }
 
         .eyebrow {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 12px;
-            letter-spacing: 5px;
-            color: var(--gold);
+            font-family: Candara, 'Trebuchet MS', sans-serif;
+            font-size: 13px;
+            letter-spacing: 3px;
+            color: var(--green);
+            font-weight: 700;
             margin-bottom: 2px;
         }
 
         .title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 56px;
+            font-family: Candara, 'Trebuchet MS', sans-serif;
+            font-size: 52px;
             line-height: 1;
-            color: var(--white);
-            letter-spacing: 3px;
+            color: var(--green);
+            letter-spacing: 2px;
+            font-weight: 700;
         }
 
         .subtitle {
@@ -136,7 +138,7 @@
         }
 
         .clue-n {
-            font-family: 'Bebas Neue', sans-serif;
+            font-family: Candara, 'Trebuchet MS', sans-serif;
             font-size: 20px;
             color: var(--green);
             line-height: 1.2;
@@ -211,7 +213,7 @@
             position: absolute;
             top: calc(100% + 4px);
             left: 0; right: 0;
-            background: #142D1C;
+            background: #FFFFFF;
             border: 1px solid var(--card-border);
             border-radius: 10px;
             max-height: 210px;
@@ -291,10 +293,11 @@
         .result-emoji { font-size: 52px; margin-bottom: 14px; }
 
         .result-heading {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 38px;
+            font-family: Candara, 'Trebuchet MS', sans-serif;
+            font-size: 36px;
             color: var(--white);
-            letter-spacing: 2px;
+            letter-spacing: 1px;
+            font-weight: 700;
             margin-bottom: 4px;
         }
 
@@ -372,7 +375,7 @@
 <body>
 
 <header>
-    <div class="eyebrow">Green &amp; White Army</div>
+    <div class="eyebrow">GAWA-Stats</div>
     <div class="title">GAWA QUIZ</div>
     <div class="subtitle" id="quizLabel">Who Am I?</div>
 </header>
