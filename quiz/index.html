@@ -445,7 +445,7 @@
 
 <script>
 // ── Data injected by build script ────────────────────────────────────────────
-const QUIZ          = {"quiz_number": 2, "tm_player_id": "351597", "player_name": "Shayne Lavery", "clues": ["I was born in 1998", "My most recent cap was in 2024", "I have 20 senior caps for Northern Ireland", "I was born in Lurgan", "My initials are S.L."], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/351597"};
+const QUIZ          = {"quiz_number": 2, "tm_player_id": "351597", "player_name": "Shayne Lavery", "clues": ["I was born in Lurgan", "My most recent cap was in 2024", "I have scored 3 senior international goal(s)", "I made my senior NI debut in 2018", "My initials are S.L."], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/351597"};
 const PLAYER_NAMES  = ["Aaron Donnelly", "Adam Barton", "Adam Thompson", "Alfie McCalmont", "Ali McCann", "Bailey Peacock-Farrell", "Ben Reeves", "Billy McKay", "Brad Lyons", "Braiden Graham", "Brodie Spencer", "Callum Marshall", "Cameron McGeehan", "Caolan Boyd-Munce", "Carl Winchester", "Ceadach O'Neill", "Chris Casement", "Ciaron Brown", "Conor Bradley", "Conor Hazard", "Conor McMenamin", "Conor Washington", "Dale Taylor", "Daniel Ballard", "Danny Lafferty", "Darren Robinson", "Devlan Moses", "Dion Charles", "Eoin Toal", "Ethan Galbraith", "Gary Hamilton", "Gavin Whyte", "George Saville", "Isaac Price", "Ivan Sproule", "Jamal Lewis", "James Lawrie", "James McClean", "Jamie Donley", "Jamie McDonnell", "Jamie Mulgrew", "Jamie Reid", "Jamie Ward", "Jonny Russell", "Jonny Tuffey", "Jordan Jones", "Jordan Owens", "Jordan Thompson", "Josh Carson", "Josh Clarke", "Josh Magennis", "Josh McQuoid", "Justin Devenny", "Kieran Morrison", "Kyle Lafferty", "Kyle Vassell", "Lee Bonis", "Lee Hodson", "Lee McEvilly", "Liam Boyce", "Liam Donnelly", "Luke McCullough", "Luke Southwood", "Makenzie Kirk", "Marty Donnelly", "Matty Kennedy", "Michael Bryan", "Michael Forbes", "Michael Smith", "Niall McGinn", "Oliver Norwood", "Paddy Lane", "Paddy McNair", "Patrick Kelly", "Paul Paton", "Paul Smyth", "Peter Thompson", "Pierce Charles", "Robert Garrett", "Ronan Hale", "Rory Patterson", "Ross McCausland", "Ruairi McConville", "Ryan Johnson", "Ryan McLaughlin", "Sam McClelland", "Seán Webb", "Shane Duffy", "Shane Ferguson", "Shay McCartan", "Shayne Lavery", "Shea Charles", "Terry Devlin", "Tom Atcheson", "Tom Flanagan", "Trai Hume", "Trevor Carson", "Will Grigg"];
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -610,7 +610,7 @@ function share() {
         `GAWA Quiz #${QUIZ.quiz_number} — Who Am I?`,
         emoji,
         scoreText,
-        'https://gawa-quiz.github.io/'
+        'https://quiz.gawa-stats.com'
     ].join('\n');
 
     if (navigator.share) {
