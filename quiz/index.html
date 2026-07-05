@@ -464,6 +464,21 @@
             font-weight: 500;
         }
 
+        .streak {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--clue-bg);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 16px;
+        }
+
+        .streak-fire { font-size: 18px; }
+
         footer {
             margin-top: 28px;
             font-size: 12px;
@@ -577,6 +592,10 @@
         <div class="result-heading" id="resultHeading"></div>
         <div class="result-name" id="resultName"></div>
         <div class="result-score" id="resultScore"></div>
+        <div class="streak" id="streakBadge" style="display:none">
+            <span class="streak-fire">🔥</span>
+            <span id="streakText"></span>
+        </div>
         <a class="tm-btn" id="tmLink" href="#" target="_blank" rel="noopener noreferrer">
             ⚽ View on Transfermarkt
         </a>
@@ -590,7 +609,7 @@
 
 <script>
 // ── Data injected by build script ────────────────────────────────────────────
-const QUIZ         = {"quiz_number": 4, "question_type": "who_am_i", "player_name": "Shea Charles", "clues": ["I am 189cm tall", "My most recent cap was in 2026", "I have scored 1 senior international goal(s)", "I currently play for Southampton", "My initials are S.C."], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/747951"};
+const QUIZ         = {"quiz_number": 4, "question_type": "who_am_i", "player_name": "Shea Charles", "clues": ["More specifically, I play as a Central Midfielder", "My most recent cap was in 2026", "I currently play for Southampton", "I play as a Midfielder", "My initials are S.C."], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/747951"};
 const PLAYER_NAMES = ["Aaron Donnelly", "Aaron Hughes", "Adam Barton", "Adam McGurk", "Adam Thompson", "Adrian Coote", "Alan Blayney", "Alan Fettis", "Alan Mannus", "Alex Bruce", "Alfie McCalmont", "Alfie Mccalmont", "Ali McCann", "Ali Mccann", "Andy Kirk", "Andy Little", "Andy Smith", "Bailey Peacock Farrell", "Bailey Peacock-Farrell", "Ben Reeves", "Billy McKay", "Billy Mckay", "Brad Lyons", "Braiden Graham", "Brian McLean", "Brodie Spencer", "Callum Marshall", "Callum Morris", "Cameron McGeehan", "Caolan Boyd Munce", "Caolan Boyd-Munce", "Caolan Lavery", "Carl Johnston", "Carl Winchester", "Ceadach O'Neill", "Charlie McCann", "Chris Baird", "Chris Brunt", "Chris Casement", "Christy Pym", "Ciaran Toner", "Ciaron Brown", "Colin Coates", "Colin Murdock", "Conor Bradley", "Conor Devlin", "Conor Hazard", "Conor McLaughlin", "Conor McMenamin", "Conor Mclaughlin", "Conor Mcmenamin", "Conor Washington", "Corry Evans", "Craig Cathcart", "Dale Taylor", "Damien Johnson", "Dan Ballard", "Daniel Ballard", "Danny Griffin", "Danny Lafferty", "Danny Sonner", "Darren Robinson", "David Healy", "Dean Shiels", "Devlan Moses", "Dion Charles", "Eoin Toal", "Ethan Galbraith", "Gareth McAuley", "Gareth Mcauley", "Gary Hamilton", "Gavin Whyte", "George McCartney", "George Mccartney", "George Saville", "Gerard Doherty", "Gerry Taggart", "Glenn Ferguson", "Grant McCann", "Grant Mccann", "Ian Nolan", "Isaac Price", "Ivan Sproule", "Jamal Lewis", "James Lawrie", "James McClean", "James McPake", "James Mcpake", "James Quinn", "Jamie Donley", "Jamie McDonnell", "Jamie Mcdonnell", "Jamie Mulgrew", "Jamie Reid", "Jamie Ward", "Jeff Hughes", "Jeff Whitley", "Jim Magilton", "Joel Cooper", "Johnny Gorman", "Jon McCarthy", "Jonny Evans", "Jonny Russell", "Jonny Steele", "Jonny Tuffey", "Jordan Jones", "Jordan Owens", "Jordan Thompson", "Josh Carson", "Josh Clarke", "Josh Magennis", "Josh McQuoid", "Josh Mcquoid", "Justin Devenny", "Keith Gillespie", "Kevin Braniff", "Kevin Horlock", "Kieran Morrison", "Kofi Balmer", "Kyle Lafferty", "Kyle Vassell", "Lee Bonis", "Lee Camp", "Lee Hodson", "Lee McEvilly", "Liam Boyce", "Liam Donnelly", "Liam Hughes", "Luke McCullough", "Luke Mccullough", "Luke Southwood", "Maik Taylor", "Makenzie Kirk", "Mark Clyde", "Mark Hughes", "Mark Sykes", "Mark Williams", "Martin Paterson", "Marty Donnelly", "Matty Kennedy", "Matty Lund", "Michael Bryan", "Michael Duff", "Michael Duffy", "Michael Forbes", "Michael Gault", "Michael Hughes", "Michael Ingham", "Michael McGovern", "Michael Mcgovern", "Michael O'Connor", "Michael Oconnor", "Michael Smith", "Neil Lennon", "Niall McGinn", "Niall Mcginn", "Oliver Norwood", "Paddy Lane", "Paddy McCourt", "Paddy McNair", "Paddy Mcnair", "Patrick Kelly", "Paul McVeigh", "Paul Paton", "Paul Smyth", "Peter Kennedy", "Peter Thompson", "Phil Gray", "Phil Mulryne", "Pierce Charles", "Robert Garrett", "Ronan Hale", "Rory Donnelly", "Rory McArdle", "Rory McKeown", "Rory Mcardle", "Rory Patterson", "Ross McCausland", "Ross Mccausland", "Roy Carroll", "Ruairi McConville", "Ruairi Mcconville", "Ryan Johnson", "Ryan McGivern", "Ryan McLaughlin", "Ryan Mcgivern", "Ryan Mclaughlin", "Sam McClelland", "Sammy Clingan", "Sean Goss", "Seán Webb", "Shane Duffy", "Shane Ferguson", "Shaun Holmes", "Shay McCartan", "Shayne Lavery", "Shea Charles", "Stephen Craigan", "Stephen McMullan", "Stephen Robinson", "Steve Davis", "Steve Jones", "Steve Lomas", "Steven Davis", "Stuart Dallas", "Stuart Elliott", "Terry Devlin", "Tom Atcheson", "Tom Flanagan", "Tommy Doherty", "Tony Capaldi", "Trai Hume", "Trevor Carson", "Warren Feeney", "Will Grigg"];
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -877,9 +896,53 @@ function endGame(won) {
     }
 
     document.getElementById('tmLink').href = QUIZ.transfermarkt_url || '#';
+    updateStreak(won);
     if (!QUIZ.transfermarkt_url) document.getElementById('tmLink').style.display = 'none';
 
     renderDots();
+}
+
+// ── Streak ───────────────────────────────────────────────────────────────────
+function loadStreak() {
+    try {
+        const data = JSON.parse(localStorage.getItem('gawa_streak') || '{}');
+        return { count: data.count || 0, lastDate: data.lastDate || null };
+    } catch (e) { return { count: 0, lastDate: null }; }
+}
+
+function saveStreak(count) {
+    try {
+        localStorage.setItem('gawa_streak', JSON.stringify({
+            count,
+            lastDate: new Date().toISOString().split('T')[0]
+        }));
+    } catch (e) {}
+}
+
+function updateStreak(won) {
+    const today     = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const { count, lastDate } = loadStreak();
+
+    let newCount;
+    if (won) {
+        // Extend streak if last played yesterday or today, else start fresh
+        newCount = (lastDate === yesterday || lastDate === today) ? count + 1 : 1;
+        saveStreak(newCount);
+    } else {
+        newCount = 0;
+        saveStreak(0);
+    }
+
+    const badge = document.getElementById('streakBadge');
+    const text  = document.getElementById('streakText');
+    if (newCount >= 2) {
+        text.textContent = `${newCount} day streak`;
+        badge.style.display = 'inline-flex';
+    } else if (won) {
+        text.textContent = 'First of the streak!';
+        badge.style.display = 'inline-flex';
+    }
 }
 
 // ── Share ─────────────────────────────────────────────────────────────────────
