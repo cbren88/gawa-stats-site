@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAWA Quiz — Who Am I?</title>
-    <meta name="description" content="Daily Northern Ireland football quiz. Five clues. One player. Can you guess who it is?">
+    <title>GAWA Quiz — Daily NI Football</title>
+    <meta name="description" content="Daily Northern Ireland football quiz. Can you guess today's player or missing lineup?">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -35,7 +35,6 @@
             padding: 28px 16px 60px;
         }
 
-        /* ── Header ── */
         header {
             text-align: center;
             margin-bottom: 24px;
@@ -96,9 +95,7 @@
         .dot.correct  { background: var(--green); transform: scale(1.2); }
         .dot.wrong    { background: var(--wrong); }
 
-        /* ── Clues ── */
-        .clues-section { padding: 20px 24px 0; }
-
+        /* ── Section labels ── */
         .section-label {
             font-size: 10px;
             font-weight: 700;
@@ -107,6 +104,9 @@
             color: var(--muted);
             margin-bottom: 12px;
         }
+
+        /* ── Who Am I: Clues ── */
+        .clues-section { padding: 20px 24px 0; }
 
         .clues-list {
             display: flex;
@@ -144,6 +144,7 @@
             line-height: 1.2;
             flex-shrink: 0;
             width: 18px;
+            font-weight: 700;
         }
 
         .clue-text {
@@ -152,7 +153,6 @@
             color: var(--white);
         }
 
-        /* ── Reveal button ── */
         .reveal-btn {
             display: block;
             width: calc(100% - 48px);
@@ -167,27 +167,134 @@
             font-weight: 500;
             cursor: pointer;
             transition: border-color 0.2s, color 0.2s;
-            letter-spacing: 0.3px;
         }
 
-        .reveal-btn:hover:not(:disabled) {
-            border-color: var(--green);
-            color: var(--green);
+        .reveal-btn:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+        .reveal-btn:disabled { opacity: 0.35; cursor: default; }
+
+        /* ── Missing Lineup: Fixture header ── */
+        .lineup-section { padding: 20px 24px 0; }
+
+        .fixture-header {
+            background: var(--clue-bg);
+            border-left: 3px solid var(--green);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
         }
 
-        .reveal-btn:disabled {
-            opacity: 0.35;
-            cursor: default;
+        .fixture-matchup {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 3px;
+        }
+
+        .fixture-meta {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .lineup-instruction {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        /* ── Pitch ── */
+        .pitch-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 76%;
+            background: #1a7a2e;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .pitch-inner {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        .pitch-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+
+        .player-token {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            z-index: 2;
+        }
+
+        .player-dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: 800;
+            color: #1a7a2e;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        .player-token.missing .player-dot {
+            background: var(--gold);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .player-token.missing.revealed .player-dot {
+            background: var(--green);
+            animation: none;
+            font-size: 8px;
+            font-weight: 800;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
+            50%       { transform: scale(1.12); box-shadow: 0 0 0 6px rgba(245,158,11,0); }
+        }
+
+        .player-name-label {
+            font-size: 8px;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+            font-weight: 700;
+            white-space: nowrap;
+            max-width: 55px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+
+        .pitch-guesses {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 0 4px;
         }
 
         /* ── Divider ── */
-        .divider {
-            height: 1px;
-            background: var(--card-border);
-            margin: 0 24px;
-        }
+        .divider { height: 1px; background: var(--card-border); margin: 0 24px; }
 
-        /* ── Guess section ── */
+        /* ── Guess section (shared) ── */
         .guess-section { padding: 18px 24px 24px; }
 
         .guess-wrapper { position: relative; }
@@ -220,6 +327,7 @@
             overflow-y: auto;
             z-index: 200;
             display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .autocomplete.open { display: block; }
@@ -235,7 +343,7 @@
         }
 
         .ac-item:hover, .ac-item.hi {
-            background: var(--card-border);
+            background: var(--clue-bg);
             color: var(--white);
         }
 
@@ -249,7 +357,7 @@
             border: 1px solid rgba(239,68,68,0.25);
             border-radius: 8px;
             font-size: 13px;
-            color: #FCA5A5;
+            color: #DC2626;
         }
 
         .wrong-msg.show { display: flex; }
@@ -275,13 +383,12 @@
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
-            letter-spacing: 0.2px;
         }
 
         .guess-btn:hover:not(:disabled) { background: var(--green); }
         .guess-btn:disabled { opacity: 0.35; cursor: default; }
 
-        /* ── Result ── */
+        /* ── Result (shared) ── */
         .result-section {
             display: none;
             padding: 28px 24px 28px;
@@ -345,7 +452,6 @@
             font-weight: 700;
             cursor: pointer;
             transition: opacity 0.2s;
-            letter-spacing: 0.2px;
         }
 
         .share-btn:hover { opacity: 0.88; }
@@ -358,7 +464,6 @@
             font-weight: 500;
         }
 
-        /* ── Footer ── */
         footer {
             margin-top: 28px;
             font-size: 12px;
@@ -368,7 +473,7 @@
 
         @media (prefers-reduced-motion: reduce) {
             .clue-item { animation: none; }
-            .dot { transition: none; }
+            .dot, .player-token.missing .player-dot { transition: none; animation: none; }
         }
     </style>
 </head>
@@ -382,27 +487,66 @@
 
 <div class="card">
 
-    <div class="dots" id="dots">
-        <div class="dot" id="d1"></div>
-        <div class="dot" id="d2"></div>
-        <div class="dot" id="d3"></div>
-        <div class="dot" id="d4"></div>
-        <div class="dot" id="d5"></div>
+    <!-- Progress dots -->
+    <div class="dots" id="dots"></div>
+
+    <!-- WHO AM I section -->
+    <div id="whoAmISection">
+        <div class="clues-section">
+            <div class="section-label">Clues</div>
+            <div class="clues-list" id="cluesList">
+                <div class="clue-empty" id="clueEmpty">Reveal your first clue to begin…</div>
+            </div>
+        </div>
+        <button class="reveal-btn" id="revealBtn" onclick="revealClue()">
+            + Reveal next clue
+        </button>
     </div>
 
-    <div class="clues-section">
-        <div class="section-label">Clues</div>
-        <div class="clues-list" id="cluesList">
-            <div class="clue-empty" id="clueEmpty">Reveal your first clue to begin…</div>
+    <!-- MISSING LINEUP section -->
+    <div id="lineupSection" style="display:none">
+        <div class="lineup-section">
+            <div class="fixture-header">
+                <div class="fixture-matchup" id="fixtureMatchup"></div>
+                <div class="fixture-meta" id="fixtureMeta"></div>
+            </div>
+            <div class="lineup-instruction">One player is missing from this NI starting XI — who is it?</div>
+            <div class="pitch-container">
+                <div class="pitch-inner" id="pitchInner">
+                    <!-- Pitch markings SVG -->
+                    <svg class="pitch-svg" viewBox="0 0 100 76" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Outer border -->
+                        <rect x="2" y="2" width="96" height="72" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.6"/>
+                        <!-- Halfway line -->
+                        <line x1="2" y1="38" x2="98" y2="38" stroke="rgba(255,255,255,0.35)" stroke-width="0.6"/>
+                        <!-- Center circle -->
+                        <circle cx="50" cy="38" r="8" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.6"/>
+                        <!-- Center spot -->
+                        <circle cx="50" cy="38" r="0.8" fill="rgba(255,255,255,0.35)"/>
+                        <!-- Top penalty area -->
+                        <rect x="22" y="2" width="56" height="14" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.6"/>
+                        <!-- Top goal box -->
+                        <rect x="37" y="2" width="26" height="5" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.6"/>
+                        <!-- Top penalty spot -->
+                        <circle cx="50" cy="12" r="0.8" fill="rgba(255,255,255,0.35)"/>
+                        <!-- Bottom penalty area -->
+                        <rect x="22" y="60" width="56" height="14" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.6"/>
+                        <!-- Bottom goal box -->
+                        <rect x="37" y="69" width="26" height="5" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.6"/>
+                        <!-- Bottom penalty spot -->
+                        <circle cx="50" cy="64" r="0.8" fill="rgba(255,255,255,0.35)"/>
+                    </svg>
+                    <!-- Player tokens injected by JS -->
+                </div>
+            </div>
+            <!-- Guess attempt dots for lineup -->
+            <div class="pitch-guesses" id="pitchGuesses"></div>
         </div>
     </div>
 
-    <button class="reveal-btn" id="revealBtn" onclick="revealClue()">
-        + Reveal next clue
-    </button>
-
     <div class="divider"></div>
 
+    <!-- GUESS section (shared) -->
     <div class="guess-section" id="guessSection">
         <div class="section-label">Your Guess</div>
         <div class="guess-wrapper">
@@ -419,7 +563,7 @@
             <div class="autocomplete" id="acList"></div>
         </div>
         <div class="wrong-msg" id="wrongMsg">
-            <span>✗</span><span id="wrongText">Not quite — try again or reveal another clue</span>
+            <span>✗</span><span id="wrongText">Not quite — try again</span>
         </div>
         <div class="remaining" id="remaining"></div>
         <button class="guess-btn" id="guessBtn" onclick="guess()" disabled>
@@ -427,6 +571,7 @@
         </button>
     </div>
 
+    <!-- RESULT section (shared) -->
     <div class="result-section" id="resultSection">
         <div class="result-emoji" id="resultEmoji"></div>
         <div class="result-heading" id="resultHeading"></div>
@@ -441,30 +586,57 @@
 
 </div>
 
-<footer>A new player every day · <span id="footerNum"></span></footer>
+<footer>A new quiz every day · <span id="footerNum"></span></footer>
 
 <script>
 // ── Data injected by build script ────────────────────────────────────────────
-const QUIZ          = {"quiz_number": 4, "tm_player_id": "747951", "player_name": "Shea Charles", "clues": ["I have scored 1 senior international goal(s)", "I currently play for Southampton", "I am 189cm tall", "My most recent cap was in 2026", "My initials are S.C."], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/747951"};
-const PLAYER_NAMES  = ["Aaron Donnelly", "Adam Barton", "Adam Thompson", "Alfie McCalmont", "Ali McCann", "Bailey Peacock-Farrell", "Ben Reeves", "Billy McKay", "Brad Lyons", "Braiden Graham", "Brodie Spencer", "Callum Marshall", "Cameron McGeehan", "Caolan Boyd-Munce", "Carl Winchester", "Ceadach O'Neill", "Chris Casement", "Ciaron Brown", "Conor Bradley", "Conor Hazard", "Conor McMenamin", "Conor Washington", "Dale Taylor", "Daniel Ballard", "Danny Lafferty", "Darren Robinson", "Devlan Moses", "Dion Charles", "Eoin Toal", "Ethan Galbraith", "Gary Hamilton", "Gavin Whyte", "George Saville", "Isaac Price", "Ivan Sproule", "Jamal Lewis", "James Lawrie", "James McClean", "Jamie Donley", "Jamie McDonnell", "Jamie Mulgrew", "Jamie Reid", "Jamie Ward", "Jonny Russell", "Jonny Tuffey", "Jordan Jones", "Jordan Owens", "Jordan Thompson", "Josh Carson", "Josh Clarke", "Josh Magennis", "Josh McQuoid", "Justin Devenny", "Kieran Morrison", "Kyle Lafferty", "Kyle Vassell", "Lee Bonis", "Lee Hodson", "Lee McEvilly", "Liam Boyce", "Liam Donnelly", "Luke McCullough", "Luke Southwood", "Makenzie Kirk", "Marty Donnelly", "Matty Kennedy", "Michael Bryan", "Michael Forbes", "Michael Smith", "Niall McGinn", "Oliver Norwood", "Paddy Lane", "Paddy McNair", "Patrick Kelly", "Paul Paton", "Paul Smyth", "Peter Thompson", "Pierce Charles", "Robert Garrett", "Ronan Hale", "Rory Patterson", "Ross McCausland", "Ruairi McConville", "Ryan Johnson", "Ryan McLaughlin", "Sam McClelland", "Seán Webb", "Shane Duffy", "Shane Ferguson", "Shay McCartan", "Shayne Lavery", "Shea Charles", "Terry Devlin", "Tom Atcheson", "Tom Flanagan", "Trai Hume", "Trevor Carson", "Will Grigg"];
+const QUIZ         = {"quiz_number": 4, "question_type": "missing_lineup", "player_name": "Neil Lennon", "fixture_info": {"away_team": "Denmark", "home_team": "Northern Ireland", "away_score": 1, "home_score": 1, "match_date": "2000-10-07", "competition": "World Cup qualification Europe"}, "lineup_json": [{"top": 80, "left": 50, "name": "Roy Carroll"}, {"top": 63, "left": 25, "name": "Aaron Hughes"}, {"top": 63, "left": 50, "name": "Colin Murdock"}, {"top": 63, "left": 75, "name": "Gerry Taggart"}, {"top": 40, "left": 14.3, "name": "Kevin Horlock"}, {"top": 40, "left": 28.6, "name": "Jeff Whitley"}, {"top": 40, "left": 57.1, "name": "Steve Lomas"}, {"top": 40, "left": 71.4, "name": "Jim Magilton"}, {"top": 40, "left": 85.7, "name": "Stuart Elliott"}, {"top": 15, "left": 50, "name": "David Healy"}], "missing_pitch_top": 40.0, "missing_pitch_left": 42.9, "transfermarkt_url": ""};
+const PLAYER_NAMES = ["Aaron Donnelly", "Adam Barton", "Adam Thompson", "Alfie McCalmont", "Ali McCann", "Bailey Peacock-Farrell", "Ben Reeves", "Billy McKay", "Brad Lyons", "Braiden Graham", "Brodie Spencer", "Callum Marshall", "Cameron McGeehan", "Caolan Boyd-Munce", "Carl Winchester", "Ceadach O'Neill", "Chris Casement", "Ciaron Brown", "Conor Bradley", "Conor Hazard", "Conor McMenamin", "Conor Washington", "Dale Taylor", "Daniel Ballard", "Danny Lafferty", "Darren Robinson", "Devlan Moses", "Dion Charles", "Eoin Toal", "Ethan Galbraith", "Gary Hamilton", "Gavin Whyte", "George Saville", "Isaac Price", "Ivan Sproule", "Jamal Lewis", "James Lawrie", "James McClean", "Jamie Donley", "Jamie McDonnell", "Jamie Mulgrew", "Jamie Reid", "Jamie Ward", "Jonny Russell", "Jonny Tuffey", "Jordan Jones", "Jordan Owens", "Jordan Thompson", "Josh Carson", "Josh Clarke", "Josh Magennis", "Josh McQuoid", "Justin Devenny", "Kieran Morrison", "Kyle Lafferty", "Kyle Vassell", "Lee Bonis", "Lee Hodson", "Lee McEvilly", "Liam Boyce", "Liam Donnelly", "Luke McCullough", "Luke Southwood", "Makenzie Kirk", "Marty Donnelly", "Matty Kennedy", "Michael Bryan", "Michael Forbes", "Michael Smith", "Niall McGinn", "Oliver Norwood", "Paddy Lane", "Paddy McNair", "Patrick Kelly", "Paul Paton", "Paul Smyth", "Peter Thompson", "Pierce Charles", "Robert Garrett", "Ronan Hale", "Rory Patterson", "Ross McCausland", "Ruairi McConville", "Ryan Johnson", "Ryan McLaughlin", "Sam McClelland", "Seán Webb", "Shane Duffy", "Shane Ferguson", "Shay McCartan", "Shayne Lavery", "Shea Charles", "Terry Devlin", "Tom Atcheson", "Tom Flanagan", "Trai Hume", "Trevor Carson", "Will Grigg"];
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let revealed  = 0;          // clues shown so far
-let done      = false;      // game over flag
-let picked    = '';         // currently selected autocomplete name
-let acIdx     = -1;         // keyboard nav index in autocomplete
-let dotState  = new Array(5).fill('');  // '' | 'revealed' | 'correct' | 'wrong'
+const IS_WHO_AM_I = QUIZ.question_type === 'who_am_i';
+const MAX_GUESSES = IS_WHO_AM_I ? 5 : 3;  // clues for WAI, guesses for lineup
 
-const MAX = QUIZ.clues.length;  // always 5
+let revealed   = 0;      // clues revealed (who_am_i) or guesses used (lineup)
+let done       = false;
+let picked     = '';
+let acIdx      = -1;
+let dotState   = new Array(MAX_GUESSES).fill('');
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
-document.getElementById('quizLabel').textContent  = `Quiz #${QUIZ.quiz_number} · Who Am I?`;
+// ── Boot ─────────────────────────────────────────────────────────────────────
+document.getElementById('quizLabel').textContent  =
+    IS_WHO_AM_I ? `Quiz #${QUIZ.quiz_number} · Who Am I?` : `Quiz #${QUIZ.quiz_number} · Missing Lineup`;
 document.getElementById('footerNum').textContent  = `Quiz #${QUIZ.quiz_number}`;
-updateRemaining();
 
-// ── Clue reveal ───────────────────────────────────────────────────────────────
+// Render dots
+const dotsEl = document.getElementById('dots');
+for (let i = 0; i < MAX_GUESSES; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.id = `d${i}`;
+    dotsEl.appendChild(d);
+}
+
+if (IS_WHO_AM_I) {
+    // Who Am I setup
+    document.getElementById('whoAmISection').style.display = '';
+    document.getElementById('lineupSection').style.display  = 'none';
+    updateRemaining();
+} else {
+    // Missing Lineup setup
+    document.getElementById('whoAmISection').style.display = 'none';
+    document.getElementById('lineupSection').style.display  = '';
+    document.getElementById('revealBtn') && (document.getElementById('revealBtn').style.display = 'none');
+    document.getElementById('guessBtn').disabled = false;
+    renderFixtureHeader();
+    renderPitch();
+    renderPitchGuesses();
+    updateRemaining();
+}
+
+// ── WHO AM I: Clue reveal ─────────────────────────────────────────────────────
 function revealClue() {
-    if (done || revealed >= MAX) return;
+    if (done || revealed >= QUIZ.clues.length) return;
 
     const list  = document.getElementById('cluesList');
     const empty = document.getElementById('clueEmpty');
@@ -481,13 +653,90 @@ function revealClue() {
     renderDots();
     updateRemaining();
 
-    document.getElementById('guessBtn').disabled  = false;
+    document.getElementById('guessBtn').disabled = false;
     document.getElementById('wrongMsg').classList.remove('show');
 
-    if (revealed >= MAX) {
+    if (revealed >= QUIZ.clues.length) {
         const btn = document.getElementById('revealBtn');
         btn.disabled    = true;
         btn.textContent = 'All clues revealed';
+    }
+}
+
+// ── MISSING LINEUP: Pitch rendering ──────────────────────────────────────────
+function surname(fullName) {
+    const parts = fullName.trim().split(' ');
+    return parts[parts.length - 1];
+}
+
+function renderFixtureHeader() {
+    const fi = QUIZ.fixture_info;
+    if (!fi) return;
+
+    const home = fi.home_team || '';
+    const away = fi.away_team || '';
+    const score = (fi.home_score != null && fi.away_score != null)
+        ? ` ${fi.home_score}–${fi.away_score}` : '';
+
+    document.getElementById('fixtureMatchup').textContent = `${home} vs ${away}${score}`;
+
+    const date = fi.match_date ? new Date(fi.match_date).toLocaleDateString('en-GB', {
+        day: 'numeric', month: 'short', year: 'numeric'
+    }) : '';
+    const comp = fi.competition || '';
+    document.getElementById('fixtureMeta').textContent = [date, comp].filter(Boolean).join(' · ');
+}
+
+function renderPitch() {
+    const pitch = document.getElementById('pitchInner');
+
+    // Known players
+    (QUIZ.lineup_json || []).forEach(player => {
+        const token = document.createElement('div');
+        token.className = 'player-token';
+        token.style.top  = player.top  + '%';
+        token.style.left = player.left + '%';
+        token.innerHTML = `
+            <div class="player-dot">${surname(player.name).substring(0,4).toUpperCase()}</div>
+            <div class="player-name-label">${surname(player.name)}</div>
+        `;
+        pitch.appendChild(token);
+    });
+
+    // Missing player slot
+    if (QUIZ.missing_pitch_top != null && QUIZ.missing_pitch_left != null) {
+        const missing = document.createElement('div');
+        missing.className = 'player-token missing';
+        missing.id = 'missingToken';
+        missing.style.top  = QUIZ.missing_pitch_top  + '%';
+        missing.style.left = QUIZ.missing_pitch_left + '%';
+        missing.innerHTML = `
+            <div class="player-dot">?</div>
+            <div class="player-name-label">???</div>
+        `;
+        pitch.appendChild(missing);
+    }
+}
+
+function revealMissingPlayer() {
+    const token = document.getElementById('missingToken');
+    if (!token) return;
+    token.classList.add('revealed');
+    const dot = token.querySelector('.player-dot');
+    const lbl = token.querySelector('.player-name-label');
+    if (dot) dot.textContent = surname(QUIZ.player_name).substring(0,4).toUpperCase();
+    if (lbl) lbl.textContent = surname(QUIZ.player_name);
+}
+
+function renderPitchGuesses() {
+    const el = document.getElementById('pitchGuesses');
+    if (!el) return;
+    el.innerHTML = '';
+    for (let i = 0; i < MAX_GUESSES; i++) {
+        const d = document.createElement('div');
+        d.className = 'dot ' + (dotState[i] || '');
+        d.id = `d${i}`;
+        el.appendChild(d);
     }
 }
 
@@ -496,7 +745,6 @@ function onInput() {
     picked = '';
     acIdx  = -1;
     const q = document.getElementById('guessInput').value.trim().toLowerCase();
-
     if (q.length < 2) { closeAc(); return; }
 
     const hits = PLAYER_NAMES.filter(n => n.toLowerCase().includes(q)).slice(0, 8);
@@ -541,32 +789,54 @@ function hiAc(items) {
 
 // ── Guess ─────────────────────────────────────────────────────────────────────
 function guess() {
-    if (done || revealed === 0) return;
+    if (done) return;
+    if (IS_WHO_AM_I && revealed === 0) return;
 
-    const raw     = (picked || document.getElementById('guessInput').value.trim());
+    const raw     = picked || document.getElementById('guessInput').value.trim();
     if (!raw) return;
 
     const correct = raw.toLowerCase() === QUIZ.player_name.toLowerCase();
     closeAc();
 
     if (correct) {
-        dotState[revealed - 1] = 'correct';
+        dotState[revealed > 0 ? revealed - 1 : 0] = 'correct';
         renderDots();
+        if (!IS_WHO_AM_I) revealMissingPlayer();
         endGame(true);
     } else {
-        dotState[revealed - 1] = 'wrong';
+        const slot = IS_WHO_AM_I ? revealed - 1 : revealed;
+        if (slot >= 0) dotState[slot] = 'wrong';
+        revealed++;
         renderDots();
 
-        const msg = document.getElementById('wrongMsg');
-        msg.classList.add('show');
-        document.getElementById('wrongText').textContent = revealed < MAX
-            ? 'Not quite — try again or reveal another clue'
-            : 'That\'s not right — see the answer below';
+        const feedback = document.getElementById('wrongMsg');
+        feedback.classList.add('show');
+
+        const attemptsLeft = MAX_GUESSES - revealed;
+
+        if (IS_WHO_AM_I) {
+            document.getElementById('wrongText').textContent = revealed < QUIZ.clues.length
+                ? 'Not quite — try again or reveal another clue'
+                : 'That\'s not right — see the answer below';
+        } else {
+            document.getElementById('wrongText').textContent = attemptsLeft > 0
+                ? `Not quite — ${attemptsLeft} guess${attemptsLeft !== 1 ? 'es' : ''} remaining`
+                : 'That\'s not right — see the answer below';
+        }
 
         document.getElementById('guessInput').value = '';
         picked = '';
 
-        if (revealed >= MAX) endGame(false);
+        const outOfAttempts = IS_WHO_AM_I
+            ? revealed >= QUIZ.clues.length
+            : revealed >= MAX_GUESSES;
+
+        if (outOfAttempts) {
+            if (!IS_WHO_AM_I) revealMissingPlayer();
+            endGame(false);
+        }
+
+        updateRemaining();
     }
 }
 
@@ -574,7 +844,8 @@ function guess() {
 function endGame(won) {
     done = true;
     document.getElementById('guessSection').style.display  = 'none';
-    document.getElementById('revealBtn').style.display      = 'none';
+    if (document.getElementById('revealBtn'))
+        document.getElementById('revealBtn').style.display = 'none';
 
     const sec = document.getElementById('resultSection');
     sec.classList.add('show');
@@ -582,32 +853,49 @@ function endGame(won) {
     document.getElementById('resultEmoji').textContent   = won ? '🟢' : '⚪';
     document.getElementById('resultHeading').textContent = won ? 'Got it!' : 'Unlucky!';
     document.getElementById('resultName').textContent    = QUIZ.player_name;
-    document.getElementById('resultScore').textContent   = won
-        ? `Identified after ${revealed} clue${revealed !== 1 ? 's' : ''}`
-        : 'Better luck tomorrow';
+
+    if (IS_WHO_AM_I) {
+        document.getElementById('resultScore').textContent = won
+            ? `Identified after ${revealed} clue${revealed !== 1 ? 's' : ''}`
+            : 'Better luck tomorrow';
+    } else {
+        const fi = QUIZ.fixture_info || {};
+        const match = [fi.home_team, fi.away_team].filter(Boolean).join(' vs ');
+        document.getElementById('resultScore').textContent = won
+            ? `Got the missing player${match ? ' · ' + match : ''}`
+            : `Better luck tomorrow${match ? ' · ' + match : ''}`;
+    }
 
     document.getElementById('tmLink').href = QUIZ.transfermarkt_url || '#';
+    if (!QUIZ.transfermarkt_url) document.getElementById('tmLink').style.display = 'none';
 
-    // Fill remaining dots as revealed (no outcome)
-    dotState = dotState.map((s, i) => (i < revealed && s === 'revealed') ? 'revealed' : s);
     renderDots();
 }
 
 // ── Share ─────────────────────────────────────────────────────────────────────
 function share() {
-    const won   = document.getElementById('resultHeading').textContent === 'Got it!';
-    const emoji = dotState.slice(0, revealed).map(s => {
-        if (s === 'correct')  return '🟢';
-        if (s === 'wrong')    return '🔴';
-        return '⬜';
-    }).join('');
+    const won = document.getElementById('resultHeading').textContent === 'Got it!';
 
-    const scoreText = won
-        ? `Identified in ${revealed}/5 clues`
-        : 'Didn\'t get today\'s player';
+    let emoji, scoreText;
+    if (IS_WHO_AM_I) {
+        emoji = dotState.slice(0, revealed).map(s => {
+            if (s === 'correct') return '🟢';
+            if (s === 'wrong')   return '🔴';
+            return '⬜';
+        }).join('');
+        scoreText = won ? `Identified in ${revealed}/5 clues` : 'Didn\'t get today\'s player';
+    } else {
+        emoji = dotState.slice(0, Math.max(revealed, 1)).map(s => {
+            if (s === 'correct') return '🟢';
+            if (s === 'wrong')   return '🔴';
+            return '⬜';
+        }).join('');
+        scoreText = won ? 'Got the missing player!' : 'Didn\'t get the missing player';
+    }
 
+    const typeLabel = IS_WHO_AM_I ? 'Who Am I?' : 'Missing Lineup';
     const text = [
-        `GAWA Quiz #${QUIZ.quiz_number} — Who Am I?`,
+        `GAWA Quiz #${QUIZ.quiz_number} — ${typeLabel}`,
         emoji,
         scoreText,
         'https://quiz.gawa-stats.com'
@@ -630,19 +918,27 @@ function copyText(t) {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function renderDots() {
-    [1,2,3,4,5].forEach(i => {
-        document.getElementById(`d${i}`).className = `dot ${dotState[i-1]}`.trim();
-    });
+    for (let i = 0; i < MAX_GUESSES; i++) {
+        const d = document.getElementById(`d${i}`);
+        if (d) d.className = `dot ${dotState[i]}`.trim();
+    }
 }
 
 function updateRemaining() {
-    const el   = document.getElementById('remaining');
-    const left = MAX - revealed;
-    el.textContent = revealed === 0
-        ? 'Reveal at least one clue before guessing'
-        : left > 0
-            ? `${left} clue${left !== 1 ? 's' : ''} remaining`
-            : 'All clues revealed';
+    const el = document.getElementById('remaining');
+    if (IS_WHO_AM_I) {
+        const left = (QUIZ.clues || []).length - revealed;
+        el.textContent = revealed === 0
+            ? 'Reveal at least one clue before guessing'
+            : left > 0
+                ? `${left} clue${left !== 1 ? 's' : ''} remaining`
+                : 'All clues revealed';
+    } else {
+        const left = MAX_GUESSES - revealed;
+        el.textContent = left > 0
+            ? `${left} guess${left !== 1 ? 'es' : ''} remaining`
+            : '';
+    }
 }
 </script>
 
