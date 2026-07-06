@@ -753,7 +753,7 @@ function revealMissingPlayer() {
     token.classList.add('revealed');
     const dot = token.querySelector('.player-dot');
     const lbl = token.querySelector('.player-name-label');
-    if (dot) dot.textContent = surname(QUIZ.player_name).substring(0,4).toUpperCase();
+    if (dot) dot.textContent = posFromTop(QUIZ.missing_pitch_top || 40);
     if (lbl) lbl.textContent = surname(QUIZ.player_name);
 }
 
