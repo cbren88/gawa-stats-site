@@ -709,15 +709,15 @@ function renderFixtureHeader() {
     document.getElementById('fixtureMeta').textContent = [date, comp].filter(Boolean).join(' · ');
 }
 
+function posFromTop(top) {
+    if (top >= 70) return 'GK';
+    if (top >= 50) return 'DEF';
+    if (top >= 30) return 'MID';
+    return 'FWD';
+}
+
 function renderPitch() {
     const pitch = document.getElementById('pitchInner');
-
-    function posFromTop(top) {
-        if (top >= 70) return 'GK';
-        if (top >= 50) return 'DEF';
-        if (top >= 30) return 'MID';
-        return 'FWD';
-    }
 
     // Known players
     (QUIZ.lineup_json || []).forEach(player => {
