@@ -902,6 +902,12 @@ function endGame(won) {
     updateStreak(won);
     if (!QUIZ.transfermarkt_url) document.getElementById('tmLink').style.display = 'none';
 
+    const matchLinkEl = document.getElementById('matchLink');
+    if (QUIZ.match_url) {
+        matchLinkEl.href = QUIZ.match_url;
+        matchLinkEl.style.display = 'inline-flex';
+    }
+
     renderDots();
 }
 
