@@ -765,7 +765,7 @@
 
 <script>
 // ── Data injected by build script ────────────────────────────────────────────
-const QUIZ         = {"quiz_number": 3, "question_type": "who_am_i", "player_name": "Sam McClelland", "clues": ["I have 1 senior caps for Northern Ireland", "My most recent cap was in 2021", "I currently play for Without Club", "I made my senior NI debut in 2021", "My initials are S.M."], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/549566", "match_url": "", "quiz_date": "2026-07-04", "prev_date": "2026-07-03", "next_date": "2026-07-05", "is_today": false};
+const QUIZ         = {"quiz_number": 3, "question_type": "who_am_i", "player_name": "Sam McClelland", "clues": ["I made my senior NI debut in 2021", "I have 1 senior caps for Northern Ireland", "I currently play for Without Club", "My most recent cap was in 2021", "My initials are S.M."], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/549566", "match_url": "", "quiz_date": "2026-07-04", "prev_date": "2026-07-03", "next_date": "2026-07-05", "is_today": false};
 const PLAYER_NAMES = ["Aaron Donnelly", "Aaron Hughes", "Adam Barton", "Adam McGurk", "Adam Thompson", "Adrian Coote", "Alan Blayney", "Alan Fettis", "Alan Mannus", "Alex Bruce", "Alfie McCalmont", "Alfie Mccalmont", "Ali McCann", "Ali Mccann", "Andy Kirk", "Andy Little", "Andy Smith", "Bailey Peacock Farrell", "Bailey Peacock-Farrell", "Ben Reeves", "Billy McKay", "Billy Mckay", "Brad Lyons", "Braiden Graham", "Brian McLean", "Brodie Spencer", "Callum Marshall", "Callum Morris", "Cameron McGeehan", "Caolan Boyd Munce", "Caolan Boyd-Munce", "Caolan Lavery", "Carl Johnston", "Carl Winchester", "Ceadach O'Neill", "Charlie McCann", "Chris Baird", "Chris Brunt", "Chris Casement", "Christy Pym", "Ciaran Toner", "Ciaron Brown", "Colin Coates", "Colin Murdock", "Conor Bradley", "Conor Devlin", "Conor Hazard", "Conor McLaughlin", "Conor McMenamin", "Conor Mclaughlin", "Conor Mcmenamin", "Conor Washington", "Corry Evans", "Craig Cathcart", "Dale Taylor", "Damien Johnson", "Dan Ballard", "Daniel Ballard", "Danny Griffin", "Danny Lafferty", "Danny Sonner", "Darren Robinson", "David Healy", "Dean Shiels", "Devlan Moses", "Dion Charles", "Eoin Toal", "Ethan Galbraith", "Gareth McAuley", "Gareth Mcauley", "Gary Hamilton", "Gavin Whyte", "George McCartney", "George Mccartney", "George Saville", "Gerard Doherty", "Gerry Taggart", "Glenn Ferguson", "Grant McCann", "Grant Mccann", "Ian Nolan", "Isaac Price", "Ivan Sproule", "Jamal Lewis", "James Lawrie", "James McClean", "James McPake", "James Mcpake", "James Quinn", "Jamie Donley", "Jamie McDonnell", "Jamie Mcdonnell", "Jamie Mulgrew", "Jamie Reid", "Jamie Ward", "Jeff Hughes", "Jeff Whitley", "Jim Magilton", "Joel Cooper", "Johnny Gorman", "Jon McCarthy", "Jonny Evans", "Jonny Russell", "Jonny Steele", "Jonny Tuffey", "Jordan Jones", "Jordan Owens", "Jordan Thompson", "Josh Carson", "Josh Clarke", "Josh Magennis", "Josh McQuoid", "Josh Mcquoid", "Justin Devenny", "Keith Gillespie", "Kevin Braniff", "Kevin Horlock", "Kieran Morrison", "Kofi Balmer", "Kyle Lafferty", "Kyle Vassell", "Lee Bonis", "Lee Camp", "Lee Hodson", "Lee McEvilly", "Liam Boyce", "Liam Donnelly", "Liam Hughes", "Luke McCullough", "Luke Mccullough", "Luke Southwood", "Maik Taylor", "Makenzie Kirk", "Mark Clyde", "Mark Hughes", "Mark Sykes", "Mark Williams", "Martin Paterson", "Marty Donnelly", "Matty Kennedy", "Matty Lund", "Michael Bryan", "Michael Duff", "Michael Duffy", "Michael Forbes", "Michael Gault", "Michael Hughes", "Michael Ingham", "Michael McGovern", "Michael Mcgovern", "Michael O'Connor", "Michael Oconnor", "Michael Smith", "Neil Lennon", "Niall McGinn", "Niall Mcginn", "Oliver Norwood", "Paddy Lane", "Paddy McCourt", "Paddy McNair", "Paddy Mcnair", "Patrick Kelly", "Paul McVeigh", "Paul Paton", "Paul Smyth", "Peter Kennedy", "Peter Thompson", "Phil Gray", "Phil Mulryne", "Pierce Charles", "Robert Garrett", "Ronan Hale", "Rory Donnelly", "Rory McArdle", "Rory McKeown", "Rory Mcardle", "Rory Patterson", "Ross McCausland", "Ross Mccausland", "Roy Carroll", "Ruairi McConville", "Ruairi Mcconville", "Ryan Johnson", "Ryan McGivern", "Ryan McLaughlin", "Ryan Mcgivern", "Ryan Mclaughlin", "Sam McClelland", "Sammy Clingan", "Sean Goss", "Seán Webb", "Shane Duffy", "Shane Ferguson", "Shaun Holmes", "Shay McCartan", "Shayne Lavery", "Shea Charles", "Stephen Craigan", "Stephen McMullan", "Stephen Robinson", "Steve Davis", "Steve Jones", "Steve Lomas", "Steven Davis", "Stuart Dallas", "Stuart Elliott", "Terry Devlin", "Tom Atcheson", "Tom Flanagan", "Tommy Doherty", "Tony Capaldi", "Trai Hume", "Trevor Carson", "Warren Feeney", "Will Grigg"];
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -942,9 +942,8 @@ function posFromTop(top) {
 // the pitch container, which clips under overflow:hidden. Insetting the usable
 // range keeps every token's full circle+label within the visible pitch area,
 // regardless of how close to the byline a player's real position is.
-const PITCH_VERTICAL_INSET = 8;    // % — top/bottom margin reserved for token+label
-const PITCH_HORIZONTAL_INSET = 6;  // % — left/right margin
-
+// Defaults are inlined as parameters (rather than top-level consts) so this
+// function is safe to call regardless of script execution order.
 function scalePitchCoord(raw, inset) {
     if (raw == null) return raw;
     return inset + (raw / 100) * (100 - inset * 2);
@@ -952,13 +951,15 @@ function scalePitchCoord(raw, inset) {
 
 function renderPitch() {
     const pitch = document.getElementById('pitchInner');
+    const V_INSET = 8;  // % — top/bottom margin reserved for token+label
+    const H_INSET = 6;  // % — left/right margin
 
     // Known players
     (QUIZ.lineup_json || []).forEach(player => {
         const token = document.createElement('div');
         token.className = 'player-token';
-        token.style.top  = scalePitchCoord(player.top,  PITCH_VERTICAL_INSET)   + '%';
-        token.style.left = scalePitchCoord(player.left, PITCH_HORIZONTAL_INSET) + '%';
+        token.style.top  = scalePitchCoord(player.top,  V_INSET) + '%';
+        token.style.left = scalePitchCoord(player.left, H_INSET) + '%';
         token.innerHTML = `
             <div class="player-dot">${posFromTop(player.top)}</div>
             <div class="player-name-label">${surname(player.name)}</div>
@@ -971,8 +972,8 @@ function renderPitch() {
         const missing = document.createElement('div');
         missing.className = 'player-token missing';
         missing.id = 'missingToken';
-        missing.style.top  = scalePitchCoord(QUIZ.missing_pitch_top,  PITCH_VERTICAL_INSET)   + '%';
-        missing.style.left = scalePitchCoord(QUIZ.missing_pitch_left, PITCH_HORIZONTAL_INSET) + '%';
+        missing.style.top  = scalePitchCoord(QUIZ.missing_pitch_top,  V_INSET) + '%';
+        missing.style.left = scalePitchCoord(QUIZ.missing_pitch_left, H_INSET) + '%';
         missing.innerHTML = `
             <div class="player-dot">?</div>
             <div class="player-name-label">???</div>
