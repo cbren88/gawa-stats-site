@@ -802,18 +802,19 @@ function setupNavigation() {
     if (prevDate) {
         const prevUrl = isToday
             ? `./archive/${prevDate}.html`
-            : (QUIZ.next_date ? `${prevDate}.html` : `${prevDate}.html`);
+            : `${prevDate}.html`;
         prevBtn.href = prevUrl;
     } else {
         prevBtn.classList.add('invisible');
     }
 
     // Next button
+    // Every date (including today) always has a copy saved under /archive/,
+    // so we can link there unconditionally without needing to detect "today"
+    // client-side (avoids timezone edge cases).
     const nextBtn = document.getElementById('nextBtn');
     if (nextDate) {
-        const nextUrl = isToday
-            ? '#'  // no next if today
-            : (QUIZ.is_today ? './index.html' : `${nextDate}.html`);
+        const nextUrl = isToday ? '#' : `${nextDate}.html`;
         nextBtn.href = nextUrl;
         if (isToday) nextBtn.classList.add('invisible');
     } else {
