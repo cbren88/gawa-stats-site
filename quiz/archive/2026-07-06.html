@@ -942,9 +942,8 @@ function posFromTop(top) {
 // the pitch container, which clips under overflow:hidden. Insetting the usable
 // range keeps every token's full circle+label within the visible pitch area,
 // regardless of how close to the byline a player's real position is.
-const PITCH_VERTICAL_INSET = 8;    // % — top/bottom margin reserved for token+label
-const PITCH_HORIZONTAL_INSET = 6;  // % — left/right margin
-
+// Defaults are inlined as parameters (rather than top-level consts) so this
+// function is safe to call regardless of script execution order.
 function scalePitchCoord(raw, inset) {
     if (raw == null) return raw;
     return inset + (raw / 100) * (100 - inset * 2);
@@ -952,13 +951,15 @@ function scalePitchCoord(raw, inset) {
 
 function renderPitch() {
     const pitch = document.getElementById('pitchInner');
+    const V_INSET = 8;  // % — top/bottom margin reserved for token+label
+    const H_INSET = 6;  // % — left/right margin
 
     // Known players
     (QUIZ.lineup_json || []).forEach(player => {
         const token = document.createElement('div');
         token.className = 'player-token';
-        token.style.top  = scalePitchCoord(player.top,  PITCH_VERTICAL_INSET)   + '%';
-        token.style.left = scalePitchCoord(player.left, PITCH_HORIZONTAL_INSET) + '%';
+        token.style.top  = scalePitchCoord(player.top,  V_INSET) + '%';
+        token.style.left = scalePitchCoord(player.left, H_INSET) + '%';
         token.innerHTML = `
             <div class="player-dot">${posFromTop(player.top)}</div>
             <div class="player-name-label">${surname(player.name)}</div>
@@ -971,8 +972,8 @@ function renderPitch() {
         const missing = document.createElement('div');
         missing.className = 'player-token missing';
         missing.id = 'missingToken';
-        missing.style.top  = scalePitchCoord(QUIZ.missing_pitch_top,  PITCH_VERTICAL_INSET)   + '%';
-        missing.style.left = scalePitchCoord(QUIZ.missing_pitch_left, PITCH_HORIZONTAL_INSET) + '%';
+        missing.style.top  = scalePitchCoord(QUIZ.missing_pitch_top,  V_INSET) + '%';
+        missing.style.left = scalePitchCoord(QUIZ.missing_pitch_left, H_INSET) + '%';
         missing.innerHTML = `
             <div class="player-dot">?</div>
             <div class="player-name-label">???</div>
