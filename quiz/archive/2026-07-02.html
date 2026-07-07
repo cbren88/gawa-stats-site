@@ -295,6 +295,75 @@
         /* ── Divider ── */
         .divider { height: 1px; background: var(--card-border); margin: 0 24px; }
 
+        /* ── Missing Goalscorer: Scoreline ── */
+        .goalscorer-section { padding: 20px 24px 0; }
+
+        .scoreline-instruction {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        .goal-columns {
+            display: flex;
+            gap: 14px;
+        }
+
+        .goal-column { flex: 1; min-width: 0; }
+
+        .goal-column-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .goal-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--white);
+            padding: 7px 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .goal-line:last-child { border-bottom: none; }
+
+        .goal-line .goal-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .goal-line .goal-minute {
+            flex-shrink: 0;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .goal-line.missing .goal-name {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .goal-line.missing.revealed .goal-name {
+            color: var(--green);
+        }
+
+        .goal-line-empty {
+            font-size: 13px;
+            color: var(--muted);
+            font-style: italic;
+            padding: 7px 0;
+        }
+
         /* ── Guess section (shared) ── */
         .guess-section { padding: 18px 24px 24px; }
 
@@ -622,6 +691,27 @@
         </div>
     </div>
 
+    <!-- MISSING GOALSCORER section -->
+    <div id="goalscorerSection" style="display:none">
+        <div class="goalscorer-section">
+            <div class="fixture-header">
+                <div class="fixture-matchup" id="gsFixtureMatchup"></div>
+                <div class="fixture-meta" id="gsFixtureMeta"></div>
+            </div>
+            <div class="scoreline-instruction">One NI goalscorer is missing — who scored it?</div>
+            <div class="goal-columns">
+                <div class="goal-column">
+                    <div class="goal-column-label" id="gsHomeLabel"></div>
+                    <div id="gsHomeGoals"></div>
+                </div>
+                <div class="goal-column">
+                    <div class="goal-column-label" id="gsAwayLabel"></div>
+                    <div id="gsAwayGoals"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="divider"></div>
 
     <!-- GUESS section (shared) -->
@@ -675,12 +765,15 @@
 
 <script>
 // ── Data injected by build script ────────────────────────────────────────────
-const QUIZ         = {"quiz_number": 1, "question_type": "who_am_i", "player_name": "Pierce Charles", "clues": ["I was born in 2005", "I play as a Goalkeeper", "I am 183cm tall", "My club career has taken me through: Sheffield Wednesday U18 → Sheffield Wednesday U21 → Sheffield Wednesday", "My initials are P.C."], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/861600", "match_url": "", "quiz_date": "2026-07-02", "prev_date": null, "next_date": "2026-07-03", "is_today": false};
+const QUIZ         = {"quiz_number": 1, "question_type": "who_am_i", "player_name": "Pierce Charles", "clues": ["I have 12 senior caps for Northern Ireland", "I am 183cm tall", "My club career has taken me through: Sheffield Wednesday U18 → Sheffield Wednesday U21 → Sheffield Wednesday", "My most recent cap was in 2026", "My initials are P.C."], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/861600", "match_url": "", "quiz_date": "2026-07-02", "prev_date": null, "next_date": "2026-07-03", "is_today": false};
 const PLAYER_NAMES = ["Aaron Donnelly", "Aaron Hughes", "Adam Barton", "Adam McGurk", "Adam Thompson", "Adrian Coote", "Alan Blayney", "Alan Fettis", "Alan Mannus", "Alex Bruce", "Alfie McCalmont", "Alfie Mccalmont", "Ali McCann", "Ali Mccann", "Andy Kirk", "Andy Little", "Andy Smith", "Bailey Peacock Farrell", "Bailey Peacock-Farrell", "Ben Reeves", "Billy McKay", "Billy Mckay", "Brad Lyons", "Braiden Graham", "Brian McLean", "Brodie Spencer", "Callum Marshall", "Callum Morris", "Cameron McGeehan", "Caolan Boyd Munce", "Caolan Boyd-Munce", "Caolan Lavery", "Carl Johnston", "Carl Winchester", "Ceadach O'Neill", "Charlie McCann", "Chris Baird", "Chris Brunt", "Chris Casement", "Christy Pym", "Ciaran Toner", "Ciaron Brown", "Colin Coates", "Colin Murdock", "Conor Bradley", "Conor Devlin", "Conor Hazard", "Conor McLaughlin", "Conor McMenamin", "Conor Mclaughlin", "Conor Mcmenamin", "Conor Washington", "Corry Evans", "Craig Cathcart", "Dale Taylor", "Damien Johnson", "Dan Ballard", "Daniel Ballard", "Danny Griffin", "Danny Lafferty", "Danny Sonner", "Darren Robinson", "David Healy", "Dean Shiels", "Devlan Moses", "Dion Charles", "Eoin Toal", "Ethan Galbraith", "Gareth McAuley", "Gareth Mcauley", "Gary Hamilton", "Gavin Whyte", "George McCartney", "George Mccartney", "George Saville", "Gerard Doherty", "Gerry Taggart", "Glenn Ferguson", "Grant McCann", "Grant Mccann", "Ian Nolan", "Isaac Price", "Ivan Sproule", "Jamal Lewis", "James Lawrie", "James McClean", "James McPake", "James Mcpake", "James Quinn", "Jamie Donley", "Jamie McDonnell", "Jamie Mcdonnell", "Jamie Mulgrew", "Jamie Reid", "Jamie Ward", "Jeff Hughes", "Jeff Whitley", "Jim Magilton", "Joel Cooper", "Johnny Gorman", "Jon McCarthy", "Jonny Evans", "Jonny Russell", "Jonny Steele", "Jonny Tuffey", "Jordan Jones", "Jordan Owens", "Jordan Thompson", "Josh Carson", "Josh Clarke", "Josh Magennis", "Josh McQuoid", "Josh Mcquoid", "Justin Devenny", "Keith Gillespie", "Kevin Braniff", "Kevin Horlock", "Kieran Morrison", "Kofi Balmer", "Kyle Lafferty", "Kyle Vassell", "Lee Bonis", "Lee Camp", "Lee Hodson", "Lee McEvilly", "Liam Boyce", "Liam Donnelly", "Liam Hughes", "Luke McCullough", "Luke Mccullough", "Luke Southwood", "Maik Taylor", "Makenzie Kirk", "Mark Clyde", "Mark Hughes", "Mark Sykes", "Mark Williams", "Martin Paterson", "Marty Donnelly", "Matty Kennedy", "Matty Lund", "Michael Bryan", "Michael Duff", "Michael Duffy", "Michael Forbes", "Michael Gault", "Michael Hughes", "Michael Ingham", "Michael McGovern", "Michael Mcgovern", "Michael O'Connor", "Michael Oconnor", "Michael Smith", "Neil Lennon", "Niall McGinn", "Niall Mcginn", "Oliver Norwood", "Paddy Lane", "Paddy McCourt", "Paddy McNair", "Paddy Mcnair", "Patrick Kelly", "Paul McVeigh", "Paul Paton", "Paul Smyth", "Peter Kennedy", "Peter Thompson", "Phil Gray", "Phil Mulryne", "Pierce Charles", "Robert Garrett", "Ronan Hale", "Rory Donnelly", "Rory McArdle", "Rory McKeown", "Rory Mcardle", "Rory Patterson", "Ross McCausland", "Ross Mccausland", "Roy Carroll", "Ruairi McConville", "Ruairi Mcconville", "Ryan Johnson", "Ryan McGivern", "Ryan McLaughlin", "Ryan Mcgivern", "Ryan Mclaughlin", "Sam McClelland", "Sammy Clingan", "Sean Goss", "Seán Webb", "Shane Duffy", "Shane Ferguson", "Shaun Holmes", "Shay McCartan", "Shayne Lavery", "Shea Charles", "Stephen Craigan", "Stephen McMullan", "Stephen Robinson", "Steve Davis", "Steve Jones", "Steve Lomas", "Steven Davis", "Stuart Dallas", "Stuart Elliott", "Terry Devlin", "Tom Atcheson", "Tom Flanagan", "Tommy Doherty", "Tony Capaldi", "Trai Hume", "Trevor Carson", "Warren Feeney", "Will Grigg"];
 
 // ── State ─────────────────────────────────────────────────────────────────────
-const IS_WHO_AM_I = QUIZ.question_type === 'who_am_i';
-const MAX_GUESSES = IS_WHO_AM_I ? 5 : 3;  // clues for WAI, guesses for lineup
+const QUESTION_TYPE  = QUIZ.question_type;
+const IS_WHO_AM_I     = QUESTION_TYPE === 'who_am_i';
+const IS_GOALSCORER   = QUESTION_TYPE === 'missing_goalscorer';
+const IS_LINEUP       = QUESTION_TYPE === 'missing_lineup';
+const MAX_GUESSES     = IS_WHO_AM_I ? 5 : 3;  // clues for WAI, guesses for lineup/goalscorer
 
 let revealed   = 0;      // clues revealed (who_am_i) or guesses used (lineup)
 let done       = false;
@@ -709,18 +802,19 @@ function setupNavigation() {
     if (prevDate) {
         const prevUrl = isToday
             ? `./archive/${prevDate}.html`
-            : (QUIZ.next_date ? `${prevDate}.html` : `${prevDate}.html`);
+            : `${prevDate}.html`;
         prevBtn.href = prevUrl;
     } else {
         prevBtn.classList.add('invisible');
     }
 
     // Next button
+    // Every date (including today) always has a copy saved under /archive/,
+    // so we can link there unconditionally without needing to detect "today"
+    // client-side (avoids timezone edge cases).
     const nextBtn = document.getElementById('nextBtn');
     if (nextDate) {
-        const nextUrl = isToday
-            ? '#'  // no next if today
-            : (QUIZ.is_today ? './index.html' : `${nextDate}.html`);
+        const nextUrl = isToday ? '#' : `${nextDate}.html`;
         nextBtn.href = nextUrl;
         if (isToday) nextBtn.classList.add('invisible');
     } else {
@@ -737,8 +831,13 @@ function setupNavigation() {
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
 setupNavigation();
-document.getElementById('quizLabel').textContent  =
-    IS_WHO_AM_I ? `Quiz #${QUIZ.quiz_number} · Who Am I?` : `Quiz #${QUIZ.quiz_number} · Missing Lineup`;
+const QUIZ_LABELS = {
+    who_am_i: 'Who Am I?',
+    missing_lineup: 'Missing Lineup',
+    missing_goalscorer: 'Missing Goalscorer',
+};
+document.getElementById('quizLabel').textContent =
+    `Quiz #${QUIZ.quiz_number} · ${QUIZ_LABELS[QUESTION_TYPE] || ''}`;
 document.getElementById('footerNum').textContent  = `Quiz #${QUIZ.quiz_number}`;
 
 // Render dots
@@ -752,13 +851,25 @@ for (let i = 0; i < MAX_GUESSES; i++) {
 
 if (IS_WHO_AM_I) {
     // Who Am I setup
-    document.getElementById('whoAmISection').style.display = '';
-    document.getElementById('lineupSection').style.display  = 'none';
+    document.getElementById('whoAmISection').style.display    = '';
+    document.getElementById('lineupSection').style.display     = 'none';
+    document.getElementById('goalscorerSection').style.display = 'none';
+    updateRemaining();
+} else if (IS_GOALSCORER) {
+    // Missing Goalscorer setup
+    document.getElementById('whoAmISection').style.display    = 'none';
+    document.getElementById('lineupSection').style.display     = 'none';
+    document.getElementById('goalscorerSection').style.display = '';
+    document.getElementById('revealBtn') && (document.getElementById('revealBtn').style.display = 'none');
+    document.getElementById('guessBtn').disabled = false;
+    renderGoalscorerFixtureHeader();
+    renderGoalscorerColumns();
     updateRemaining();
 } else {
     // Missing Lineup setup
-    document.getElementById('whoAmISection').style.display = 'none';
-    document.getElementById('lineupSection').style.display  = '';
+    document.getElementById('whoAmISection').style.display    = 'none';
+    document.getElementById('lineupSection').style.display     = '';
+    document.getElementById('goalscorerSection').style.display = 'none';
     document.getElementById('revealBtn') && (document.getElementById('revealBtn').style.display = 'none');
     document.getElementById('guessBtn').disabled = false;
     renderFixtureHeader();
@@ -879,6 +990,75 @@ function renderPitchGuesses() {
     }
 }
 
+// ── MISSING GOALSCORER: Scoreline rendering ──────────────────────────────────
+function renderGoalscorerFixtureHeader() {
+    const gd = QUIZ.goalscorer_data;
+    if (!gd) return;
+
+    const home = gd.home_team || '';
+    const away = gd.away_team || '';
+    const score = (gd.home_score != null && gd.away_score != null)
+        ? ` ${gd.home_score}–${gd.away_score}` : '';
+
+    document.getElementById('gsFixtureMatchup').textContent = `${home} vs ${away}${score}`;
+
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const date = gd.match_date ? (([y,m,d]) => `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`)(gd.match_date.split('-')) : '';
+    document.getElementById('gsFixtureMeta').textContent = date;
+
+    document.getElementById('gsHomeLabel').textContent = home;
+    document.getElementById('gsAwayLabel').textContent = away;
+}
+
+function goalLineHTML(goal, isMissingSlot) {
+    if (isMissingSlot) {
+        return `
+            <div class="goal-line missing" id="missingGoalLine">
+                <span class="goal-name" id="missingGoalName">???</span>
+                <span class="goal-minute">${goal.minute != null ? goal.minute + "'" : ''}</span>
+            </div>`;
+    }
+    return `
+        <div class="goal-line">
+            <span class="goal-name">${goal.player_name}</span>
+            <span class="goal-minute">${goal.minute != null ? goal.minute + "'" : ''}</span>
+        </div>`;
+}
+
+function renderGoalscorerColumns() {
+    const gd = QUIZ.goalscorer_data;
+    if (!gd) return;
+
+    // ni_goals/opponent_goals don't carry a "side" flag themselves, so we key
+    // off which of home_team/away_team is "Northern Ireland"
+    const niIsHome = (gd.home_team || '').toLowerCase().includes('northern ireland');
+
+    const homeGoals = niIsHome ? (gd.ni_goals || []) : (gd.opponent_goals || []);
+    const awayGoals = niIsHome ? (gd.opponent_goals || []) : (gd.ni_goals || []);
+
+    renderGoalColumn('gsHomeGoals', homeGoals);
+    renderGoalColumn('gsAwayGoals', awayGoals);
+}
+
+function renderGoalColumn(elId, goals) {
+    const el = document.getElementById(elId);
+    if (!goals || !goals.length) {
+        el.innerHTML = '<div class="goal-line-empty">No goals</div>';
+        return;
+    }
+    el.innerHTML = goals.map(g =>
+        goalLineHTML(g, g.player_name === null)
+    ).join('');
+}
+
+function revealMissingGoalscorer() {
+    const nameEl = document.getElementById('missingGoalName');
+    const lineEl = document.getElementById('missingGoalLine');
+    if (nameEl) nameEl.textContent = QUIZ.player_name;
+    if (lineEl) lineEl.classList.add('revealed');
+}
+
+
 // ── Autocomplete ──────────────────────────────────────────────────────────────
 function onInput() {
     picked = '';
@@ -942,10 +1122,11 @@ function guess() {
     if (correct) {
         dotState[revealed > 0 ? revealed - 1 : 0] = 'correct';
         renderDots();
-        if (!IS_WHO_AM_I) revealMissingPlayer();
+        if (IS_LINEUP) revealMissingPlayer();
+        if (IS_GOALSCORER) revealMissingGoalscorer();
         endGame(true);
     } else {
-        // For who_am_i: revealClue() handles revealed increment; for lineup: do it here
+        // For who_am_i: revealClue() handles revealed increment; for lineup/goalscorer: do it here
         if (IS_WHO_AM_I) {
             if (revealed > 0) dotState[revealed - 1] = 'wrong';
         } else {
@@ -953,6 +1134,7 @@ function guess() {
             revealed++;
         }
         renderDots();
+        if (IS_GOALSCORER) renderPitchGuessesIfPresent();
 
         const feedback = document.getElementById('wrongMsg');
         feedback.classList.add('show');
@@ -982,12 +1164,19 @@ function guess() {
             : revealed >= MAX_GUESSES;
 
         if (outOfAttempts) {
-            if (!IS_WHO_AM_I) revealMissingPlayer();
+            if (IS_LINEUP) revealMissingPlayer();
+            if (IS_GOALSCORER) revealMissingGoalscorer();
             endGame(false);
         }
 
         updateRemaining();
     }
+}
+
+function renderPitchGuessesIfPresent() {
+    // missing_lineup shows dots via #pitchGuesses; goalscorer uses the shared #dots
+    // rendered by renderDots() already, so this is currently a no-op placeholder
+    // kept in case a goalscorer-specific guess indicator is added later.
 }
 
 // ── End game ──────────────────────────────────────────────────────────────────
@@ -1008,6 +1197,12 @@ function endGame(won) {
         document.getElementById('resultScore').textContent = won
             ? `Identified after ${revealed} clue${revealed !== 1 ? 's' : ''}`
             : 'Better luck tomorrow';
+    } else if (IS_GOALSCORER) {
+        const gd = QUIZ.goalscorer_data || {};
+        const match = [gd.home_team, gd.away_team].filter(Boolean).join(' vs ');
+        document.getElementById('resultScore').textContent = won
+            ? `Got the missing goalscorer${match ? ' · ' + match : ''}`
+            : `Better luck tomorrow${match ? ' · ' + match : ''}`;
     } else {
         const fi = QUIZ.fixture_info || {};
         const match = [fi.home_team, fi.away_team].filter(Boolean).join(' vs ');
@@ -1084,6 +1279,13 @@ function share() {
             return '⬜';
         }).join('');
         scoreText = won ? `Identified in ${revealed}/5 clues` : 'Didn\'t get today\'s player';
+    } else if (IS_GOALSCORER) {
+        emoji = dotState.slice(0, Math.max(revealed, 1)).map(s => {
+            if (s === 'correct') return '🟢';
+            if (s === 'wrong')   return '🔴';
+            return '⬜';
+        }).join('');
+        scoreText = won ? 'Got the missing goalscorer!' : 'Didn\'t get the missing goalscorer';
     } else {
         emoji = dotState.slice(0, Math.max(revealed, 1)).map(s => {
             if (s === 'correct') return '🟢';
@@ -1093,7 +1295,7 @@ function share() {
         scoreText = won ? 'Got the missing player!' : 'Didn\'t get the missing player';
     }
 
-    const typeLabel = IS_WHO_AM_I ? 'Who Am I?' : 'Missing Lineup';
+    const typeLabel = QUIZ_LABELS[QUESTION_TYPE] || '';
     const text = [
         `GAWA Quiz #${QUIZ.quiz_number} — ${typeLabel}`,
         emoji,
