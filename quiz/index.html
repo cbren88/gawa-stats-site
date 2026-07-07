@@ -937,6 +937,19 @@ function posFromTop(top) {
     return 'FWD';
 }
 
+// Player tokens are centered on their top/left coordinate (translate(-50%, -50%)),
+// so a raw value near 0 or 100 pushes half the token + its name label outside
+// the pitch container, which clips under overflow:hidden. Insetting the usable
+// range keeps every token's full circle+label within the visible pitch area,
+// regardless of how close to the byline a player's real position is.
+const PITCH_VERTICAL_INSET = 8;    // % — top/bottom margin reserved for token+label
+const PITCH_HORIZONTAL_INSET = 6;  // % — left/right margin
+
+function scalePitchCoord(raw, inset) {
+    if (raw == null) return raw;
+    return inset + (raw / 100) * (100 - inset * 2);
+}
+
 function renderPitch() {
     const pitch = document.getElementById('pitchInner');
 
@@ -944,8 +957,8 @@ function renderPitch() {
     (QUIZ.lineup_json || []).forEach(player => {
         const token = document.createElement('div');
         token.className = 'player-token';
-        token.style.top  = player.top  + '%';
-        token.style.left = player.left + '%';
+        token.style.top  = scalePitchCoord(player.top,  PITCH_VERTICAL_INSET)   + '%';
+        token.style.left = scalePitchCoord(player.left, PITCH_HORIZONTAL_INSET) + '%';
         token.innerHTML = `
             <div class="player-dot">${posFromTop(player.top)}</div>
             <div class="player-name-label">${surname(player.name)}</div>
@@ -958,8 +971,8 @@ function renderPitch() {
         const missing = document.createElement('div');
         missing.className = 'player-token missing';
         missing.id = 'missingToken';
-        missing.style.top  = QUIZ.missing_pitch_top  + '%';
-        missing.style.left = QUIZ.missing_pitch_left + '%';
+        missing.style.top  = scalePitchCoord(QUIZ.missing_pitch_top,  PITCH_VERTICAL_INSET)   + '%';
+        missing.style.left = scalePitchCoord(QUIZ.missing_pitch_left, PITCH_HORIZONTAL_INSET) + '%';
         missing.innerHTML = `
             <div class="player-dot">?</div>
             <div class="player-name-label">???</div>
