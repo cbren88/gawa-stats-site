@@ -954,12 +954,29 @@ function renderPitch() {
     const V_INSET = 8;  // % — top/bottom margin reserved for token+label
     const H_INSET = 6;  // % — left/right margin
 
+    // Transfermarkt's own pitch graphic is a trapezoid (narrower at the GK's
+    // end, to fake 3D perspective), so its raw left% values are only centered
+    // relative to that shape — not relative to our plain rectangular container.
+    // We correct this by finding the goalkeeper's left value (there's always
+    // exactly one) and shifting every player by the same amount needed to pull
+    // the GK to true center (50%), which re-centers the whole formation as a
+    // rigid block rather than distorting relative spacing between players.
+    const allPlayers = QUIZ.lineup_json || [];
+    const gk = allPlayers.find(p => posFromTop(p.top) === 'GK');
+    let horizontalOffset = 0;
+    if (gk && gk.left != null) {
+        horizontalOffset = 50 - gk.left;
+    } else if (QUIZ.missing_pitch_top != null && posFromTop(QUIZ.missing_pitch_top) === 'GK') {
+        // Rare case: the missing player IS the goalkeeper — center on that slot instead
+        horizontalOffset = 50 - QUIZ.missing_pitch_left;
+    }
+
     // Known players
-    (QUIZ.lineup_json || []).forEach(player => {
+    allPlayers.forEach(player => {
         const token = document.createElement('div');
         token.className = 'player-token';
         token.style.top  = scalePitchCoord(player.top,  V_INSET) + '%';
-        token.style.left = scalePitchCoord(player.left, H_INSET) + '%';
+        token.style.left = scalePitchCoord(player.left + horizontalOffset, H_INSET) + '%';
         token.innerHTML = `
             <div class="player-dot">${posFromTop(player.top)}</div>
             <div class="player-name-label">${surname(player.name)}</div>
@@ -972,8 +989,8 @@ function renderPitch() {
         const missing = document.createElement('div');
         missing.className = 'player-token missing';
         missing.id = 'missingToken';
-        missing.style.top  = scalePitchCoord(QUIZ.missing_pitch_top,  V_INSET) + '%';
-        missing.style.left = scalePitchCoord(QUIZ.missing_pitch_left, H_INSET) + '%';
+        missing.style.top  = scalePitchCoord(QUIZ.missing_pitch_top, V_INSET) + '%';
+        missing.style.left = scalePitchCoord(QUIZ.missing_pitch_left + horizontalOffset, H_INSET) + '%';
         missing.innerHTML = `
             <div class="player-dot">?</div>
             <div class="player-name-label">???</div>
