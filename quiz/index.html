@@ -765,7 +765,7 @@
 
 <script>
 // ── Data injected by build script ────────────────────────────────────────────
-const QUIZ         = {"quiz_number": 10, "question_type": "who_am_i", "player_name": "Jamie Reid", "clues": ["My club career has taken me through: Exeter City → Dorchester Town → Exeter City → Weymouth FC → Exeter City → Torquay United → Exeter City → Truro City FC → Exeter City → Torquay United → Exeter City → Torquay United → Exeter City → Torquay United → Mansfield Town → Stevenage FC", "I have scored 2 senior international goal(s)", "My most recent cap was in 2026", "I play as a Forward", "My initials are J.R."], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/250840", "match_url": "", "quiz_date": "2026-07-11", "prev_date": "2026-07-10", "next_date": null, "is_today": true};
+const QUIZ         = {"quiz_number": 10, "question_type": "who_am_i", "player_name": "Jamie Reid", "clues": ["I was born in Torquay", "I am 181cm tall", "I have 16 senior caps for Northern Ireland", "My most recent cap was in 2026", "My initials are J.R."], "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/250840", "match_url": "", "quiz_date": "2026-07-11", "prev_date": "2026-07-10", "next_date": null, "is_today": true};
 const PLAYER_NAMES = ["Aaron Donnelly", "Aaron Hughes", "Adam Barton", "Adam McGurk", "Adam Thompson", "Adrian Coote", "Alan Blayney", "Alan Fettis", "Alan Mannus", "Alex Bruce", "Alfie McCalmont", "Alfie Mccalmont", "Ali McCann", "Ali Mccann", "Andy Kirk", "Andy Little", "Andy Smith", "Atcheson", "Bailey Peacock Farrell", "Bailey Peacock-Farrell", "Baird", "Ballard", "Ben Reeves", "Billy McKay", "Billy Mckay", "Blayney", "Bonis", "Boyce", "Boyd-Munce", "Brad Lyons", "Bradley", "Braiden Graham", "Braniff", "Brian McLean", "Brodie Spencer", "Brown", "Bruce", "Brunt", "Bryan", "Callum Marshall", "Callum Morris", "Cameron McGeehan", "Camp", "Caolan Boyd Munce", "Caolan Boyd-Munce", "Caolan Lavery", "Capaldi", "Carl Johnston", "Carl Winchester", "Carroll", "Carson", "Cathcart", "Ceadach O'Neill", "Charles", "Charlie McCann", "Chris Baird", "Chris Brunt", "Chris Casement", "Christy Pym", "Ciaran Toner", "Ciaron Brown", "Clingan", "Clyde", "Colin Coates", "Colin Murdock", "Conor Bradley", "Conor Devlin", "Conor Hazard", "Conor McLaughlin", "Conor McMenamin", "Conor Mclaughlin", "Conor Mcmenamin", "Conor Washington", "Corry Evans", "Craig Cathcart", "Craigan", "Dale Taylor", "Dallas", "Damien Johnson", "Dan Ballard", "Daniel Ballard", "Danny Griffin", "Danny Lafferty", "Danny Sonner", "Darren Robinson", "David Healy", "Davis", "Dean Shiels", "Devenny", "Devlan Moses", "Devlin", "Dion Charles", "Doherty", "Donley", "Donnelly", "Duff", "Elliott", "Eoin Toal", "Ethan Galbraith", "Evans", "Feeney", "Ferguson", "Flanagan", "Galbraith", "Gareth McAuley", "Gareth Mcauley", "Garrett", "Gary Hamilton", "Gavin Whyte", "George McCartney", "George Mccartney", "George Saville", "Gerard Doherty", "Gerry Taggart", "Gillespie", "Glenn Ferguson", "Gorman", "Grant McCann", "Grant Mccann", "Griffin", "Grigg", "Hale", "Hazard", "Healy", "Hodson", "Hughes", "Hume", "Ian Nolan", "Ingham", "Isaac Price", "Ivan Sproule", "Jamal Lewis", "James Lawrie", "James McClean", "James McPake", "James Mcpake", "James Quinn", "Jamie Donley", "Jamie McDonnell", "Jamie Mcdonnell", "Jamie Mulgrew", "Jamie Reid", "Jamie Ward", "Jeff Hughes", "Jeff Whitley", "Jim Magilton", "Joel Cooper", "Johnny Gorman", "Johnson", "Jon McCarthy", "Jones", "Jonny Evans", "Jonny Russell", "Jonny Steele", "Jonny Tuffey", "Jordan Jones", "Jordan Owens", "Jordan Thompson", "Josh Carson", "Josh Clarke", "Josh Magennis", "Josh McQuoid", "Josh Mcquoid", "Justin Devenny", "Keith Gillespie", "Kelly", "Kennedy", "Kevin Braniff", "Kevin Horlock", "Kieran Morrison", "Kirk", "Kofi Balmer", "Kyle Lafferty", "Kyle Vassell", "Lafferty", "Lane", "Lavery", "Lee Bonis", "Lee Camp", "Lee Hodson", "Lee McEvilly", "Lennon", "Lewis", "Liam Boyce", "Liam Donnelly", "Liam Hughes", "Little", "Lomas", "Luke McCullough", "Luke Mccullough", "Luke Southwood", "Lund", "Lyons", "Magennis", "Magilton", "Maik Taylor", "Makenzie Kirk", "Mannus", "Mark Clyde", "Mark Hughes", "Mark Sykes", "Mark Williams", "Marshall", "Martin Paterson", "Marty Donnelly", "Matty Kennedy", "Matty Lund", "McAuley", "McCalmont", "McCann", "McCartney", "McCausland", "McConville", "McCullough", "McDonnell", "McGinn", "McGivern", "McGovern", "McKay", "McLaughlin", "McMenamin", "McNair", "McPake", "McQuoid", "Michael Bryan", "Michael Duff", "Michael Duffy", "Michael Forbes", "Michael Gault", "Michael Hughes", "Michael Ingham", "Michael McGovern", "Michael Mcgovern", "Michael O'Connor", "Michael Oconnor", "Michael Smith", "Morrison", "Mulgrew", "Mulryne", "Murdock", "Neil Lennon", "Niall McGinn", "Niall Mcginn", "Nolan", "Norwood", "O'Connor", "Oliver Norwood", "Paddy Lane", "Paddy McCourt", "Paddy McNair", "Paddy Mcnair", "Paterson", "Patrick Kelly", "Patterson", "Paul McVeigh", "Paul Paton", "Paul Smyth", "Peacock-Fa.", "Peter Kennedy", "Peter Thompson", "Phil Gray", "Phil Mulryne", "Pierce Charles", "Price", "Quinn", "Reeves", "Reid", "Robert Garrett", "Ronan Hale", "Rory Donnelly", "Rory McArdle", "Rory McKeown", "Rory Mcardle", "Rory Patterson", "Ross McCausland", "Ross Mccausland", "Roy Carroll", "Ruairi McConville", "Ruairi Mcconville", "Ryan Johnson", "Ryan McGivern", "Ryan McLaughlin", "Ryan Mcgivern", "Ryan Mclaughlin", "Sam McClelland", "Sammy Clingan", "Saville", "Sean Goss", "Seán Webb", "Shane Duffy", "Shane Ferguson", "Shaun Holmes", "Shay McCartan", "Shayne Lavery", "Shea Charles", "Shiels", "Smith", "Smyth", "Sonner", "Spencer", "Sproule", "Stephen Carson", "Stephen Craigan", "Stephen McMullan", "Stephen Robinson", "Steve Davis", "Steve Jones", "Steve Lomas", "Steven Davis", "Stuart Dallas", "Stuart Elliott", "Taggart", "Taylor", "Terry Devlin", "Thompson", "Toal", "Tom Atcheson", "Tom Flanagan", "Tommy Doherty", "Tony Capaldi", "Trai Hume", "Trevor Carson", "Ward", "Warren Feeney", "Washington", "Whitley", "Whyte", "Will Grigg", "Williams"];
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -790,39 +790,57 @@ function formatDate(dateStr) {
 }
 
 function setupNavigation() {
-    const isToday  = QUIZ.is_today;
+    // QUIZ.is_today is baked into the page at BUILD time and never changes
+    // afterward — a page that genuinely was "today" when generated keeps
+    // is_today = true forever, even once real time moves on and it becomes
+    // an old archive page. That staleness previously caused two bugs:
+    // (1) navigation links using the wrong relative path prefix once a page
+    //     aged out of being "today", producing a doubled /archive/archive/
+    //     segment when clicking Previous from a now-stale "today" page;
+    // (2) the archive banner and Next-button hiding staying wrong forever.
+    //
+    // Fix: derive both from things that are always correct at page-load time,
+    // not from a frozen build-time snapshot.
+    //   - isArchivePage: true whenever this page's URL lives under /archive/,
+    //     which is a permanent structural fact, never stale.
+    //   - isCurrentDate: compare QUIZ.quiz_date against the browser's actual
+    //     current date, so it's always accurate regardless of build time.
+    const isArchivePage = window.location.pathname.includes('/archive/');
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const isCurrentDate = QUIZ.quiz_date === todayStr;
+
     const prevDate = QUIZ.prev_date;
     const nextDate = QUIZ.next_date;
 
     // Date label in nav
     document.getElementById('navDate').textContent = formatDate(QUIZ.quiz_date);
 
-    // Prev button
+    // Prev button — path prefix depends on WHERE this page lives, not
+    // whether it was "today" when built.
     const prevBtn = document.getElementById('prevBtn');
     if (prevDate) {
-        const prevUrl = isToday
-            ? `./archive/${prevDate}.html`
-            : `${prevDate}.html`;
+        const prevUrl = isArchivePage
+            ? `${prevDate}.html`
+            : `./archive/${prevDate}.html`;
         prevBtn.href = prevUrl;
     } else {
         prevBtn.classList.add('invisible');
     }
 
-    // Next button
-    // Every date (including today) always has a copy saved under /archive/,
-    // so we can link there unconditionally without needing to detect "today"
-    // client-side (avoids timezone edge cases).
+    // Next button — every date (including today) always has a copy saved
+    // under /archive/, so the path itself doesn't need special-casing here;
+    // only whether to show/hide it depends on whether this really is today.
     const nextBtn = document.getElementById('nextBtn');
     if (nextDate) {
-        const nextUrl = isToday ? '#' : `${nextDate}.html`;
+        const nextUrl = isCurrentDate ? '#' : `${nextDate}.html`;
         nextBtn.href = nextUrl;
-        if (isToday) nextBtn.classList.add('invisible');
+        if (isCurrentDate) nextBtn.classList.add('invisible');
     } else {
         nextBtn.classList.add('invisible');
     }
 
     // Archive banner for past quizzes
-    if (!isToday) {
+    if (!isCurrentDate) {
         const banner = document.getElementById('archiveBanner');
         document.getElementById('archiveDate').textContent = formatDate(QUIZ.quiz_date);
         banner.style.display = 'block';
