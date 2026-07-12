@@ -610,9 +610,139 @@
             .clue-item { animation: none; }
             .dot, .player-token.missing .player-dot { transition: none; animation: none; }
         }
+
+        /* ── First-visit welcome popup ── */
+        .intro-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(3px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .intro-overlay.show {
+            display: flex;
+            animation: introFadeIn 0.25s ease;
+        }
+
+        @keyframes introFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .intro-card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 420px;
+            padding: 28px 26px 26px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .intro-eyebrow {
+            font-family: Candara, 'Trebuchet MS', sans-serif;
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: var(--green);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .intro-title {
+            font-family: Candara, 'Trebuchet MS', sans-serif;
+            font-size: 28px;
+            line-height: 1.15;
+            color: var(--white);
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .intro-modes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .intro-mode {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: var(--clue-bg);
+            border-left: 3px solid var(--green);
+            border-radius: 10px;
+            padding: 11px 14px;
+        }
+
+        .intro-mode-emoji {
+            font-size: 18px;
+            line-height: 1.3;
+            flex-shrink: 0;
+        }
+
+        .intro-mode-text { font-size: 13px; line-height: 1.45; color: var(--text); }
+        .intro-mode-text strong { color: var(--white); }
+
+        .intro-footnote {
+            font-size: 12.5px;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .intro-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--green-mid);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .intro-btn:hover { background: var(--green); }
+
+        @media (prefers-reduced-motion: reduce) {
+            .intro-overlay.show { animation: none; }
+        }
     </style>
 </head>
 <body>
+
+<!-- First-visit welcome popup -->
+<div class="intro-overlay" id="introOverlay">
+    <div class="intro-card">
+        <div class="intro-eyebrow">GAWA-STATS</div>
+        <div class="intro-title">Welcome to GAWA Quiz</div>
+        <div class="intro-modes">
+            <div class="intro-mode">
+                <span class="intro-mode-emoji">🕵️</span>
+                <span class="intro-mode-text"><strong>Who Am I?</strong> — reveal clues one at a time and guess the mystery NI player before you run out.</span>
+            </div>
+            <div class="intro-mode">
+                <span class="intro-mode-emoji">⚽</span>
+                <span class="intro-mode-text"><strong>Missing Lineup</strong> — one player is missing from a real NI starting XI. Work out who's missing from the pitch.</span>
+            </div>
+            <div class="intro-mode">
+                <span class="intro-mode-emoji">🥅</span>
+                <span class="intro-mode-text"><strong>Missing Goalscorer</strong> — one goalscorer from a real scoreline is hidden. Guess who scored it.</span>
+            </div>
+        </div>
+        <div class="intro-footnote">A new quiz mode rotates in daily. Build a streak by playing every day, and share your result when you're done.</div>
+        <button class="intro-btn" id="introBtn">Let's play →</button>
+    </div>
+</div>
 
 <header>
     <div class="eyebrow">GAWA-Stats</div>
@@ -1391,6 +1521,34 @@ function updateRemaining() {
             : '';
     }
 }
+
+// ── First-visit welcome popup ────────────────────────────────────────────────
+(function setupIntroPopup() {
+    const SEEN_KEY = 'gawa_quiz_seen_intro';
+    const overlay  = document.getElementById('introOverlay');
+    const btn      = document.getElementById('introBtn');
+    if (!overlay || !btn) return;
+
+    let alreadySeen = false;
+    try { alreadySeen = localStorage.getItem(SEEN_KEY) === '1'; } catch (e) {}
+
+    if (!alreadySeen) {
+        overlay.classList.add('show');
+    }
+
+    function dismiss() {
+        overlay.classList.remove('show');
+        try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) {}
+    }
+
+    btn.addEventListener('click', dismiss);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) dismiss();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('show')) dismiss();
+    });
+})();
 </script>
 
 </body>
