@@ -283,15 +283,29 @@ def main():
             player_names = [r[0] for r in cur.fetchall()]
 
         # Opponent/team names for the debut_details autocomplete — every
-        # distinct national team NI have faced, excluding NI themselves.
+        # distinct senior national team NI have faced, excluding NI
+        # themselves. team_level = 'senior' is a first filter, but it isn't
+        # fully reliable on its own — at least one fixture (NI U19 vs Germany
+        # U19) is mistagged as team_level='senior' in the source data despite
+        # both team names clearly being youth sides. The additional text
+        # exclusion below catches any such mistagged rows directly.
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT DISTINCT team FROM (
-                    SELECT home_team AS team FROM stg.ni_fixtures
+                SELECT DISTINCT
+                    -- Normalize a known naming inconsistency in the source
+                    -- data: TM's scraper has recorded this team under two
+                    -- different spellings across different fixtures.
+                    CASE WHEN team = 'Bosnia & Herzegovina' THEN 'Bosnia-Herzegovina'
+                         ELSE team
+                    END AS team
+                FROM (
+                    SELECT home_team AS team FROM stg.ni_fixtures WHERE team_level = 'senior'
                     UNION
-                    SELECT away_team AS team FROM stg.ni_fixtures
+                    SELECT away_team AS team FROM stg.ni_fixtures WHERE team_level = 'senior'
                 ) t
-                WHERE team IS NOT NULL AND LOWER(team) NOT LIKE '%northern ireland%'
+                WHERE team IS NOT NULL
+                  AND LOWER(team) NOT LIKE '%northern ireland%'
+                  AND team !~* '\\mu(1[0-9]|2[0-1])\\M'
                 ORDER BY 1
             """)
             team_names = [r[0] for r in cur.fetchall()]

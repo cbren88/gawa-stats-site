@@ -1,6 +1,6 @@
 -- =============================================================================
 -- GAWA QUIZ — Daily pick
--- Run once daily (1am cron). Rotates strictly between the three question
+-- Run once daily (1am cron). Rotates strictly between the four question
 -- types based on yesterday's type, then picks a random unused question
 -- of that type.
 -- =============================================================================
@@ -12,11 +12,12 @@ WITH yesterday_type AS (
     LIMIT 1
 ),
 next_type AS (
-    -- Rotation order: who_am_i -> missing_lineup -> missing_goalscorer -> repeat
+    -- Rotation order: who_am_i -> missing_lineup -> missing_goalscorer -> debut_details -> repeat
     SELECT CASE (SELECT question_type FROM yesterday_type)
         WHEN 'who_am_i'           THEN 'missing_lineup'
         WHEN 'missing_lineup'     THEN 'missing_goalscorer'
-        WHEN 'missing_goalscorer' THEN 'who_am_i'
+        WHEN 'missing_goalscorer' THEN 'debut_details'
+        WHEN 'debut_details'      THEN 'who_am_i'
         ELSE 'who_am_i'  -- first-ever run, no prior quiz
     END AS question_type
 ),
