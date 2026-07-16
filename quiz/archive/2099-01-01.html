@@ -305,6 +305,26 @@
             font-style: italic;
         }
 
+        /* ── Debut Details ── */
+        .debut-field { margin-bottom: 16px; }
+
+        .debut-field-feedback {
+            font-size: 13px;
+            margin-top: 6px;
+            min-height: 18px;
+        }
+
+        .debut-field-feedback.correct { color: var(--green); font-weight: 600; }
+        .debut-field-feedback.wrong   { color: var(--wrong); }
+
+        .guess-input:disabled {
+            background: var(--card-bg, #f4f4f4);
+            color: var(--green);
+            font-weight: 600;
+            border-color: var(--green);
+            opacity: 1;
+        }
+
         .goal-columns {
             display: flex;
             gap: 14px;
@@ -712,9 +732,58 @@
         </div>
     </div>
 
+    <!-- DEBUT DETAILS section -->
+    <div id="debutSection" style="display:none">
+        <div class="goalscorer-section">
+            <div class="fixture-header">
+                <div class="fixture-matchup" id="debutPlayerName"></div>
+            </div>
+            <div class="scoreline-instruction">Which team did they debut against, and in what year?</div>
+
+            <div class="debut-field">
+                <div class="section-label">Opponent</div>
+                <div class="guess-wrapper">
+                    <input
+                        id="debutOpponentInput"
+                        class="guess-input"
+                        type="text"
+                        placeholder="Type a team name…"
+                        autocomplete="off"
+                        spellcheck="false"
+                        oninput="onDebutOpponentInput()"
+                        onkeydown="onDebutKey(event)"
+                    />
+                    <div class="autocomplete" id="debutOpponentAcList"></div>
+                </div>
+                <div class="debut-field-feedback" id="debutOpponentFeedback"></div>
+            </div>
+
+            <div class="debut-field">
+                <div class="section-label">Year</div>
+                <input
+                    id="debutYearInput"
+                    class="guess-input"
+                    type="number"
+                    inputmode="numeric"
+                    placeholder="e.g. 2006"
+                    onkeydown="onDebutKey(event)"
+                />
+                <div class="debut-field-feedback" id="debutYearFeedback"></div>
+            </div>
+
+            <div class="wrong-msg" id="debutWrongMsg">
+                <span>✗</span><span id="debutWrongText">Not quite — try again</span>
+            </div>
+            <div class="remaining" id="debutRemaining"></div>
+            <button class="guess-btn" id="debutGuessBtn" onclick="debutGuess()">
+                Submit Guess
+            </button>
+        </div>
+    </div>
+
     <div class="divider"></div>
 
-    <!-- GUESS section (shared) -->
+    <!-- GUESS section (shared — hidden entirely for debut_details, which has its own inputs above) -->
     <div class="guess-section" id="guessSection">
         <div class="section-label">Your Guess</div>
         <div class="guess-wrapper">
@@ -765,21 +834,29 @@
 
 <script>
 // ── Data injected by build script ────────────────────────────────────────────
-const QUIZ         = {"quiz_number": 9999, "question_type": "missing_goalscorer", "player_name": "David Healy", "missing_tm_player_id": "14021", "goalscorer_data": {"ni_goals": [{"minute": 15, "player_name": null, "tm_player_id": "14021"}], "away_team": "Germany", "home_team": "Northern Ireland", "away_score": 4, "home_score": 1, "match_date": "2005-06-04", "opponent_goals": [{"minute": 17, "player_name": "Asamoah"}, {"minute": 62, "player_name": "Ballack"}, {"minute": 66, "player_name": "Ballack"}, {"minute": 82, "player_name": "Lukas Podolski"}]}, "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/14021", "match_url": "https://www.transfermarkt.co.uk/spielbericht/index/spielbericht/973168", "quiz_date": "2099-01-01", "prev_date": "2026-07-07", "next_date": null, "is_today": false};
-const PLAYER_NAMES = ["Aaron Donnelly", "Aaron Hughes", "Adam Barton", "Adam McGurk", "Adam Thompson", "Adrian Coote", "Alan Blayney", "Alan Fettis", "Alan Mannus", "Alex Bruce", "Alfie McCalmont", "Alfie Mccalmont", "Ali McCann", "Ali Mccann", "Andy Kirk", "Andy Little", "Andy Smith", "Atcheson", "Bailey Peacock Farrell", "Bailey Peacock-Farrell", "Baird", "Ballard", "Ben Reeves", "Billy McKay", "Billy Mckay", "Blayney", "Bonis", "Boyce", "Boyd-Munce", "Brad Lyons", "Bradley", "Braiden Graham", "Braniff", "Brian McLean", "Brodie Spencer", "Brown", "Bruce", "Brunt", "Bryan", "Callum Marshall", "Callum Morris", "Cameron McGeehan", "Camp", "Caolan Boyd Munce", "Caolan Boyd-Munce", "Caolan Lavery", "Capaldi", "Carl Johnston", "Carl Winchester", "Carroll", "Carson", "Cathcart", "Ceadach O'Neill", "Charles", "Charlie McCann", "Chris Baird", "Chris Brunt", "Chris Casement", "Christy Pym", "Ciaran Toner", "Ciaron Brown", "Clingan", "Clyde", "Colin Coates", "Colin Murdock", "Conor Bradley", "Conor Devlin", "Conor Hazard", "Conor McLaughlin", "Conor McMenamin", "Conor Mclaughlin", "Conor Mcmenamin", "Conor Washington", "Corry Evans", "Craig Cathcart", "Craigan", "Dale Taylor", "Dallas", "Damien Johnson", "Dan Ballard", "Daniel Ballard", "Danny Griffin", "Danny Lafferty", "Danny Sonner", "Darren Robinson", "David Healy", "Davis", "Dean Shiels", "Devenny", "Devlan Moses", "Devlin", "Dion Charles", "Doherty", "Donley", "Donnelly", "Duff", "Elliott", "Eoin Toal", "Ethan Galbraith", "Evans", "Feeney", "Ferguson", "Flanagan", "Galbraith", "Gareth McAuley", "Gareth Mcauley", "Garrett", "Gary Hamilton", "Gavin Whyte", "George McCartney", "George Mccartney", "George Saville", "Gerard Doherty", "Gerry Taggart", "Gillespie", "Glenn Ferguson", "Gorman", "Grant McCann", "Grant Mccann", "Griffin", "Grigg", "Hale", "Hazard", "Healy", "Hodson", "Hughes", "Hume", "Ian Nolan", "Ingham", "Isaac Price", "Ivan Sproule", "Jamal Lewis", "James Lawrie", "James McClean", "James McPake", "James Mcpake", "James Quinn", "Jamie Donley", "Jamie McDonnell", "Jamie Mcdonnell", "Jamie Mulgrew", "Jamie Reid", "Jamie Ward", "Jeff Hughes", "Jeff Whitley", "Jim Magilton", "Joel Cooper", "Johnny Gorman", "Johnson", "Jon McCarthy", "Jones", "Jonny Evans", "Jonny Russell", "Jonny Steele", "Jonny Tuffey", "Jordan Jones", "Jordan Owens", "Jordan Thompson", "Josh Carson", "Josh Clarke", "Josh Magennis", "Josh McQuoid", "Josh Mcquoid", "Justin Devenny", "Keith Gillespie", "Kelly", "Kennedy", "Kevin Braniff", "Kevin Horlock", "Kieran Morrison", "Kirk", "Kofi Balmer", "Kyle Lafferty", "Kyle Vassell", "Lafferty", "Lane", "Lavery", "Lee Bonis", "Lee Camp", "Lee Hodson", "Lee McEvilly", "Lennon", "Lewis", "Liam Boyce", "Liam Donnelly", "Liam Hughes", "Little", "Lomas", "Luke McCullough", "Luke Mccullough", "Luke Southwood", "Lund", "Lyons", "Magennis", "Magilton", "Maik Taylor", "Makenzie Kirk", "Mannus", "Mark Clyde", "Mark Hughes", "Mark Sykes", "Mark Williams", "Marshall", "Martin Paterson", "Marty Donnelly", "Matty Kennedy", "Matty Lund", "McAuley", "McCalmont", "McCann", "McCartney", "McCausland", "McConville", "McCullough", "McDonnell", "McGinn", "McGivern", "McGovern", "McKay", "McLaughlin", "McMenamin", "McNair", "McPake", "McQuoid", "Michael Bryan", "Michael Duff", "Michael Duffy", "Michael Forbes", "Michael Gault", "Michael Hughes", "Michael Ingham", "Michael McGovern", "Michael Mcgovern", "Michael O'Connor", "Michael Oconnor", "Michael Smith", "Morrison", "Mulgrew", "Mulryne", "Murdock", "Neil Lennon", "Niall McGinn", "Niall Mcginn", "Nolan", "Norwood", "O'Connor", "Oliver Norwood", "Paddy Lane", "Paddy McCourt", "Paddy McNair", "Paddy Mcnair", "Paterson", "Patrick Kelly", "Patterson", "Paul McVeigh", "Paul Paton", "Paul Smyth", "Peacock-Fa.", "Peter Kennedy", "Peter Thompson", "Phil Gray", "Phil Mulryne", "Pierce Charles", "Price", "Quinn", "Reeves", "Reid", "Robert Garrett", "Ronan Hale", "Rory Donnelly", "Rory McArdle", "Rory McKeown", "Rory Mcardle", "Rory Patterson", "Ross McCausland", "Ross Mccausland", "Roy Carroll", "Ruairi McConville", "Ruairi Mcconville", "Ryan Johnson", "Ryan McGivern", "Ryan McLaughlin", "Ryan Mcgivern", "Ryan Mclaughlin", "Sam McClelland", "Sammy Clingan", "Saville", "Sean Goss", "Seán Webb", "Shane Duffy", "Shane Ferguson", "Shaun Holmes", "Shay McCartan", "Shayne Lavery", "Shea Charles", "Shiels", "Smith", "Smyth", "Sonner", "Spencer", "Sproule", "Stephen Carson", "Stephen Craigan", "Stephen McMullan", "Stephen Robinson", "Steve Davis", "Steve Jones", "Steve Lomas", "Steven Davis", "Stuart Dallas", "Stuart Elliott", "Taggart", "Taylor", "Terry Devlin", "Thompson", "Toal", "Tom Atcheson", "Tom Flanagan", "Tommy Doherty", "Tony Capaldi", "Trai Hume", "Trevor Carson", "Ward", "Warren Feeney", "Washington", "Whitley", "Whyte", "Will Grigg", "Williams"];
+const QUIZ         = {"quiz_number": 9999, "question_type": "debut_details", "player_name": "Alfie McCalmont", "debut_tm_player_id": "471368", "debut_opponent": "Luxembourg", "debut_year": 2019, "transfermarkt_url": "https://www.transfermarkt.co.uk/-/profil/spieler/471368", "match_url": "https://www.transfermarkt.co.uk/spielbericht/index/spielbericht/3133370", "quiz_date": "2099-01-01", "prev_date": "2026-07-16", "next_date": null, "is_today": false};
+const PLAYER_NAMES = ["Aaron Donnelly", "Aaron Hughes", "Adam Barton", "Adam McGurk", "Adam Thompson", "Adrian Coote", "Aidan Davison", "Alan Blayney", "Alan Fettis", "Alan Mannus", "Alan McDonald", "Alex Bruce", "Alfie McCalmont", "Ali McCann", "Andy Kirk", "Andy Little", "Andy Smith", "Anton Rogan", "Bailey Peacock Farrell", "Bailey Peacock-Farrell", "Barry Hunter", "Ben Reeves", "Billy McKay", "Brad Lyons", "Braiden Graham", "Brian McLean", "Brodie Spencer", "Callum Marshall", "Callum Morris", "Cameron McGeehan", "Caolan Boyd Munce", "Caolan Boyd-Munce", "Caolan Lavery", "Carl Johnston", "Carl Winchester", "Ceadach O'Neill", "Charlie McCann", "Chris Baird", "Chris Brunt", "Chris Casement", "Christy Pym", "Ciaran Toner", "Ciaron Brown", "Colin Clarke", "Colin Coates", "Colin Hill", "Colin Murdock", "Colin O'Neill", "Conor Bradley", "Conor Devlin", "Conor Hazard", "Conor McLaughlin", "Conor McMenamin", "Conor Washington", "Corry Evans", "Craig Cathcart", "Dale Taylor", "Damien Johnson", "Dan Ballard", "Daniel Ballard", "Danny Griffin", "Danny Lafferty", "Danny Sonner", "Danny Wilson", "Darren Patterson", "Darren Robinson", "David Healy", "David McCreery", "Dean Shiels", "Devlan Moses", "Dion Charles", "Eoin Toal", "Ethan Galbraith", "Gareth McAuley", "Gary Fleming", "Gary Hamilton", "Gavin Whyte", "George McCartney", "George O'Boyle", "George Saville", "Gerard Doherty", "Gerry McMahon", "Gerry Taggart", "Glenn Ferguson", "Grant McCann", "Iain Dowie", "Iain Jenkins", "Ian Nolan", "Isaac Price", "Ivan Sproule", "Jamal Lewis", "James Lawrie", "James McClean", "James McPake", "James Quinn", "Jamie Donley", "Jamie McDonnell", "Jamie Mulgrew", "Jamie Reid", "Jamie Ward", "Jeff Hughes", "Jeff Whitley", "Jim Magilton", "Jim Whitley", "Jimmy Quinn", "Joel Cooper", "John McClelland", "Johnny Gorman", "Jon McCarthy", "Jonny Evans", "Jonny Russell", "Jonny Steele", "Jonny Tuffey", "Jordan Jones", "Jordan Owens", "Jordan Thompson", "Josh Carson", "Josh Clarke", "Josh Magennis", "Josh McQuoid", "Justin Devenny", "Keith Gillespie", "Keith Rowland", "Kevin Braniff", "Kevin Horlock", "Kevin Wilson", "Kieran Morrison", "Kingsley Black", "Kofi Balmer", "Kyle Lafferty", "Kyle Vassell", "Lee Bonis", "Lee Camp", "Lee Hodson", "Lee McEvilly", "Liam Boyce", "Liam Donnelly", "Liam Hughes", "Luke McCullough", "Luke Southwood", "Maik Taylor", "Makenzie Kirk", "Mal Donaghy", "Mark Clyde", "Mark Hughes", "Mark Sykes", "Mark Williams", "Martin Paterson", "Marty Donnelly", "Matty Kennedy", "Matty Lund", "Michael Bryan", "Michael Duff", "Michael Duffy", "Michael Forbes", "Michael Gault", "Michael Hughes", "Michael Ingham", "Michael McGovern", "Michael O'Connor", "Michael O'Neill", "Michael Oconnor", "Michael Smith", "Neil Lennon", "Niall McGinn", "Nigel Worthington", "Oliver Norwood", "Paddy Lane", "Paddy McCourt", "Paddy McNair", "Pat McGibbon", "Patrick Kelly", "Paul Kee", "Paul McVeigh", "Paul Paton", "Paul Smyth", "Peter Kennedy", "Peter Thompson", "Phil Gray", "Phil Mulryne", "Pierce Charles", "Robbie Dennison", "Robert Garrett", "Ronan Hale", "Rory Donnelly", "Rory McArdle", "Rory McKeown", "Rory Patterson", "Ross McCausland", "Roy Carroll", "Ruairi McConville", "Ryan Johnson", "Ryan McGivern", "Ryan McLaughlin", "Sam McClelland", "Sammy Clingan", "Sean Goss", "Seán Webb", "Shane Duffy", "Shane Ferguson", "Shaun Holmes", "Shay McCartan", "Shayne Lavery", "Shea Charles", "Stephen Carson", "Stephen Craigan", "Stephen McBride", "Stephen McMullan", "Stephen Robinson", "Steve Jones", "Steve Lomas", "Steve Morrow", "Steven Davis", "Stuart Dallas", "Stuart Elliott", "Terry Devlin", "Tom Atcheson", "Tom Flanagan", "Tommy Doherty", "Tommy Wright", "Tony Capaldi", "Trai Hume", "Trevor Carson", "Trevor Wood", "Warren Feeney", "Will Grigg"];
+const TEAM_NAMES   = ["Albania", "Albania U17", "Albania U19", "Andorra", "Armenia", "Austria", "Azerbaijan", "Azerbaijan U19", "Azerbaijan U21", "Barbados", "Belarus", "Belgium", "Bosnia & Herzegovina", "Bosnia-Herzegovina", "Bulgaria", "Canada", "Chile", "Colombia", "Costa Rica", "Croatia", "Cyprus", "Czech Republic", "Czechia", "Czechia U19", "Czechia U21", "Denmark", "Denmark U17", "Denmark U19", "Denmark U21", "England", "England U17", "England U21", "Estonia", "Faroe Islands", "Finland", "Finland U21", "France", "France U17", "France U19", "France U21", "Georgia", "Georgia U21", "Germany", "Germany U19", "Germany U21", "Greece", "Greece U17", "Greece U21", "Guinea", "Hungary", "Hungary U17", "Iceland", "Ireland", "Ireland U17", "Israel", "Israel U17", "Israel U19", "Italy", "Italy U17", "Italy U19", "Kazakhstan", "Kazakhstan U19", "Kosovo", "Latvia", "Latvia U21", "Liechtenstein", "Lithuania", "Lithuania U17", "Lithuania U21", "Luxembourg", "Luxembourg U21", "Malta", "Malta U19", "Malta U21", "Mexico", "Moldova", "Moldova U19", "Montenegro", "Morocco", "N. Ireland", "Netherlands", "Netherlands U17", "Netherlands U19", "New Zealand", "Norway", "Norway U18", "Norway U19", "Panama", "Poland", "Portugal", "Portugal U21", "Qatar", "Republic of Ireland", "Romania", "Romania U19", "Romania U21", "Russia", "Russia U21", "Saint Kitts and Nevis", "San Marino", "San Marino U17", "Scotland", "Scotland U17", "Scotland U21", "Serbia", "Serbia U21", "Serbia and Montenegro", "Slovakia", "Slovakia U21", "Slovenia", "Slovenia U17", "Slovenia U19", "South Korea", "Spain", "Spain U21", "Sweden", "Sweden U17", "Switzerland", "Switzerland U19", "Thailand", "Trinidad and Tobago", "Turkiye", "USA", "Ukraine", "Ukraine U19", "Ukraine U21", "United States", "Unknown (17335)", "Uruguay", "Wales", "Yugoslavia"];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const QUESTION_TYPE  = QUIZ.question_type;
 const IS_WHO_AM_I     = QUESTION_TYPE === 'who_am_i';
 const IS_GOALSCORER   = QUESTION_TYPE === 'missing_goalscorer';
 const IS_LINEUP       = QUESTION_TYPE === 'missing_lineup';
-const MAX_GUESSES     = IS_WHO_AM_I ? 5 : 3;  // clues for WAI, guesses for lineup/goalscorer
+const IS_DEBUT        = QUESTION_TYPE === 'debut_details';
+const MAX_GUESSES     = IS_WHO_AM_I ? 5 : 3;  // clues for WAI, guesses for lineup/goalscorer/debut
 
-let revealed   = 0;      // clues revealed (who_am_i) or guesses used (lineup)
+let revealed   = 0;      // clues revealed (who_am_i) or guesses used (lineup/goalscorer/debut)
 let done       = false;
 let picked     = '';
 let acIdx      = -1;
 let dotState   = new Array(MAX_GUESSES).fill('');
+
+// debut_details tracks each field's correctness separately, since a guess
+// can get one field right and the other wrong — the correct one then locks
+// so the person isn't re-typing something they already got right.
+let debutOpponentLocked = false;
+let debutYearLocked     = false;
 
 // ── Navigation & date display ────────────────────────────────────────────────
 function formatDate(dateStr) {
@@ -790,39 +867,57 @@ function formatDate(dateStr) {
 }
 
 function setupNavigation() {
-    const isToday  = QUIZ.is_today;
+    // QUIZ.is_today is baked into the page at BUILD time and never changes
+    // afterward — a page that genuinely was "today" when generated keeps
+    // is_today = true forever, even once real time moves on and it becomes
+    // an old archive page. That staleness previously caused two bugs:
+    // (1) navigation links using the wrong relative path prefix once a page
+    //     aged out of being "today", producing a doubled /archive/archive/
+    //     segment when clicking Previous from a now-stale "today" page;
+    // (2) the archive banner and Next-button hiding staying wrong forever.
+    //
+    // Fix: derive both from things that are always correct at page-load time,
+    // not from a frozen build-time snapshot.
+    //   - isArchivePage: true whenever this page's URL lives under /archive/,
+    //     which is a permanent structural fact, never stale.
+    //   - isCurrentDate: compare QUIZ.quiz_date against the browser's actual
+    //     current date, so it's always accurate regardless of build time.
+    const isArchivePage = window.location.pathname.includes('/archive/');
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const isCurrentDate = QUIZ.quiz_date === todayStr;
+
     const prevDate = QUIZ.prev_date;
     const nextDate = QUIZ.next_date;
 
     // Date label in nav
     document.getElementById('navDate').textContent = formatDate(QUIZ.quiz_date);
 
-    // Prev button
+    // Prev button — path prefix depends on WHERE this page lives, not
+    // whether it was "today" when built.
     const prevBtn = document.getElementById('prevBtn');
     if (prevDate) {
-        const prevUrl = isToday
-            ? `./archive/${prevDate}.html`
-            : `${prevDate}.html`;
+        const prevUrl = isArchivePage
+            ? `${prevDate}.html`
+            : `./archive/${prevDate}.html`;
         prevBtn.href = prevUrl;
     } else {
         prevBtn.classList.add('invisible');
     }
 
-    // Next button
-    // Every date (including today) always has a copy saved under /archive/,
-    // so we can link there unconditionally without needing to detect "today"
-    // client-side (avoids timezone edge cases).
+    // Next button — every date (including today) always has a copy saved
+    // under /archive/, so the path itself doesn't need special-casing here;
+    // only whether to show/hide it depends on whether this really is today.
     const nextBtn = document.getElementById('nextBtn');
     if (nextDate) {
-        const nextUrl = isToday ? '#' : `${nextDate}.html`;
+        const nextUrl = isCurrentDate ? '#' : `${nextDate}.html`;
         nextBtn.href = nextUrl;
-        if (isToday) nextBtn.classList.add('invisible');
+        if (isCurrentDate) nextBtn.classList.add('invisible');
     } else {
         nextBtn.classList.add('invisible');
     }
 
     // Archive banner for past quizzes
-    if (!isToday) {
+    if (!isCurrentDate) {
         const banner = document.getElementById('archiveBanner');
         document.getElementById('archiveDate').textContent = formatDate(QUIZ.quiz_date);
         banner.style.display = 'block';
@@ -835,6 +930,7 @@ const QUIZ_LABELS = {
     who_am_i: 'Who Am I?',
     missing_lineup: 'Missing Lineup',
     missing_goalscorer: 'Missing Goalscorer',
+    debut_details: 'Debut Details',
 };
 document.getElementById('quizLabel').textContent =
     `Quiz #${QUIZ.quiz_number} · ${QUIZ_LABELS[QUESTION_TYPE] || ''}`;
@@ -854,28 +950,58 @@ if (IS_WHO_AM_I) {
     document.getElementById('whoAmISection').style.display    = '';
     document.getElementById('lineupSection').style.display     = 'none';
     document.getElementById('goalscorerSection').style.display = 'none';
+    document.getElementById('debutSection').style.display      = 'none';
     updateRemaining();
 } else if (IS_GOALSCORER) {
     // Missing Goalscorer setup
     document.getElementById('whoAmISection').style.display    = 'none';
     document.getElementById('lineupSection').style.display     = 'none';
     document.getElementById('goalscorerSection').style.display = '';
+    document.getElementById('debutSection').style.display      = 'none';
     document.getElementById('revealBtn') && (document.getElementById('revealBtn').style.display = 'none');
     document.getElementById('guessBtn').disabled = false;
     renderGoalscorerFixtureHeader();
     renderGoalscorerColumns();
     updateRemaining();
+} else if (IS_DEBUT) {
+    // Debut Details setup — this type has its own inputs, so the shared
+    // guessSection is hidden entirely rather than reused.
+    document.getElementById('whoAmISection').style.display    = 'none';
+    document.getElementById('lineupSection').style.display     = 'none';
+    document.getElementById('goalscorerSection').style.display = 'none';
+    document.getElementById('debutSection').style.display      = '';
+    document.getElementById('guessSection').style.display      = 'none';
+    document.getElementById('revealBtn') && (document.getElementById('revealBtn').style.display = 'none');
+    renderDebutSection();
+    updateDebutRemaining();
 } else {
     // Missing Lineup setup
     document.getElementById('whoAmISection').style.display    = 'none';
     document.getElementById('lineupSection').style.display     = '';
     document.getElementById('goalscorerSection').style.display = 'none';
+    document.getElementById('debutSection').style.display      = 'none';
     document.getElementById('revealBtn') && (document.getElementById('revealBtn').style.display = 'none');
     document.getElementById('guessBtn').disabled = false;
     renderFixtureHeader();
     renderPitch();
     renderPitchGuesses();
     updateRemaining();
+}
+
+// If this quiz was already completed (win or loss), restore that result
+// instead of letting the person play again after a refresh.
+const savedResult = loadSavedResult();
+if (savedResult) {
+    revealed  = savedResult.revealed;
+    dotState  = savedResult.dotState;
+    if (IS_LINEUP)     revealMissingPlayer();
+    if (IS_GOALSCORER) revealMissingGoalscorer();
+    if (IS_DEBUT) {
+        debutOpponentLocked = savedResult.debutOpponentLocked || false;
+        debutYearLocked     = savedResult.debutYearLocked || false;
+        revealDebutAnswers();
+    }
+    endGame(savedResult.won, true);
 }
 
 // ── WHO AM I: Clue reveal ─────────────────────────────────────────────────────
@@ -1089,6 +1215,148 @@ function revealMissingGoalscorer() {
     if (lineEl) lineEl.classList.add('revealed');
 }
 
+// ── DEBUT DETAILS ─────────────────────────────────────────────────────────────
+let debutAcIdx = -1;
+
+function renderDebutSection() {
+    document.getElementById('debutPlayerName').textContent = QUIZ.player_name;
+}
+
+function onDebutOpponentInput() {
+    debutAcIdx = -1;
+    const q = document.getElementById('debutOpponentInput').value.trim().toLowerCase();
+    if (q.length < 2) { closeDebutAc(); return; }
+
+    const hits = TEAM_NAMES.filter(n => n.toLowerCase().includes(q)).slice(0, 8);
+    if (!hits.length) { closeDebutAc(); return; }
+
+    const ac = document.getElementById('debutOpponentAcList');
+    ac.innerHTML = hits.map(n =>
+        `<div class="ac-item" data-n="${n}" onmousedown="pickDebutAc('${n.replace(/'/g,"\\'")}')">${n}</div>`
+    ).join('');
+    ac.classList.add('open');
+}
+
+function pickDebutAc(name) {
+    document.getElementById('debutOpponentInput').value = name;
+    closeDebutAc();
+}
+
+function closeDebutAc() {
+    const ac = document.getElementById('debutOpponentAcList');
+    ac.classList.remove('open');
+    ac.innerHTML = '';
+}
+
+function onDebutKey(e) {
+    const items = document.getElementById('debutOpponentAcList').querySelectorAll('.ac-item');
+    if (e.key === 'ArrowDown')     { debutAcIdx = Math.min(debutAcIdx + 1, items.length - 1); hiDebutAc(items); }
+    else if (e.key === 'ArrowUp')  { debutAcIdx = Math.max(debutAcIdx - 1, -1);                hiDebutAc(items); }
+    else if (e.key === 'Enter') {
+        if (debutAcIdx >= 0 && items[debutAcIdx]) pickDebutAc(items[debutAcIdx].dataset.n);
+        else debutGuess();
+    }
+    else if (e.key === 'Escape') closeDebutAc();
+}
+
+function hiDebutAc(items) {
+    items.forEach((el, i) => el.classList.toggle('hi', i === debutAcIdx));
+}
+
+function updateDebutRemaining() {
+    const el = document.getElementById('debutRemaining');
+    const left = MAX_GUESSES - revealed;
+    el.textContent = left > 0
+        ? `${left} guess${left !== 1 ? 'es' : ''} remaining`
+        : 'No guesses remaining';
+}
+
+function debutGuess() {
+    if (done) return;
+
+    const opponentInput = document.getElementById('debutOpponentInput');
+    const yearInput      = document.getElementById('debutYearInput');
+
+    const opponentGuess = debutOpponentLocked ? QUIZ.debut_opponent : opponentInput.value.trim();
+    const yearGuess      = debutYearLocked ? String(QUIZ.debut_year) : yearInput.value.trim();
+
+    if (!opponentGuess || !yearGuess) return;
+
+    closeDebutAc();
+
+    const opponentCorrect = opponentGuess.toLowerCase() === (QUIZ.debut_opponent || '').toLowerCase();
+    const yearCorrect      = yearGuess === String(QUIZ.debut_year);
+
+    // Lock in whichever field is now correct, so the person isn't re-typing
+    // something they've already got right on a subsequent attempt.
+    if (opponentCorrect) debutOpponentLocked = true;
+    if (yearCorrect)     debutYearLocked     = true;
+
+    const oppFeedback  = document.getElementById('debutOpponentFeedback');
+    const yearFeedback = document.getElementById('debutYearFeedback');
+
+    oppFeedback.textContent  = opponentCorrect ? '✓ Correct' : '✗ Not quite';
+    oppFeedback.className    = 'debut-field-feedback ' + (opponentCorrect ? 'correct' : 'wrong');
+    yearFeedback.textContent = yearCorrect ? '✓ Correct' : '✗ Not quite';
+    yearFeedback.className   = 'debut-field-feedback ' + (yearCorrect ? 'correct' : 'wrong');
+
+    if (opponentCorrect) {
+        opponentInput.value = QUIZ.debut_opponent;
+        opponentInput.disabled = true;
+    }
+    if (yearCorrect) {
+        yearInput.value = QUIZ.debut_year;
+        yearInput.disabled = true;
+    }
+
+    if (opponentCorrect && yearCorrect) {
+        dotState[revealed > 0 ? revealed : 0] = 'correct';
+        revealed++;
+        renderDots();
+        endGame(true);
+        return;
+    }
+
+    dotState[revealed] = 'wrong';
+    revealed++;
+    renderDots();
+    updateDebutRemaining();
+
+    document.getElementById('debutWrongMsg').classList.add('show');
+    document.getElementById('debutWrongText').textContent =
+        (MAX_GUESSES - revealed) > 0
+            ? `Not quite — ${MAX_GUESSES - revealed} guess${(MAX_GUESSES - revealed) !== 1 ? 'es' : ''} remaining`
+            : 'That\'s not right — see the answer below';
+
+    if (!opponentCorrect) opponentInput.value = '';
+    if (!yearCorrect)     yearInput.value = '';
+
+    if (revealed >= MAX_GUESSES) {
+        revealDebutAnswers();
+        endGame(false);
+    }
+}
+
+function revealDebutAnswers() {
+    const opponentInput = document.getElementById('debutOpponentInput');
+    const yearInput      = document.getElementById('debutYearInput');
+    opponentInput.value = QUIZ.debut_opponent;
+    opponentInput.disabled = true;
+    yearInput.value = QUIZ.debut_year;
+    yearInput.disabled = true;
+
+    const oppFeedback  = document.getElementById('debutOpponentFeedback');
+    const yearFeedback = document.getElementById('debutYearFeedback');
+    if (!debutOpponentLocked) {
+        oppFeedback.textContent = `Answer: ${QUIZ.debut_opponent}`;
+        oppFeedback.className = 'debut-field-feedback';
+    }
+    if (!debutYearLocked) {
+        yearFeedback.textContent = `Answer: ${QUIZ.debut_year}`;
+        yearFeedback.className = 'debut-field-feedback';
+    }
+}
+
 
 // ── Autocomplete ──────────────────────────────────────────────────────────────
 function onInput() {
@@ -1211,11 +1479,12 @@ function renderPitchGuessesIfPresent() {
 }
 
 // ── End game ──────────────────────────────────────────────────────────────────
-function endGame(won) {
+function endGame(won, isRestore = false) {
     done = true;
     document.getElementById('guessSection').style.display  = 'none';
     if (document.getElementById('revealBtn'))
         document.getElementById('revealBtn').style.display = 'none';
+    if (IS_DEBUT) document.getElementById('debutGuessBtn').style.display = 'none';
 
     const sec = document.getElementById('resultSection');
     sec.classList.add('show');
@@ -1234,6 +1503,10 @@ function endGame(won) {
         document.getElementById('resultScore').textContent = won
             ? `Got the missing goalscorer${match ? ' · ' + match : ''}`
             : `Better luck tomorrow${match ? ' · ' + match : ''}`;
+    } else if (IS_DEBUT) {
+        document.getElementById('resultScore').textContent = won
+            ? `Got the debut details · vs ${QUIZ.debut_opponent} in ${QUIZ.debut_year}`
+            : `Better luck tomorrow · debuted vs ${QUIZ.debut_opponent} in ${QUIZ.debut_year}`;
     } else {
         const fi = QUIZ.fixture_info || {};
         const match = [fi.home_team, fi.away_team].filter(Boolean).join(' vs ');
@@ -1253,6 +1526,38 @@ function endGame(won) {
     }
 
     renderDots();
+    if (!isRestore) saveResult(won);
+}
+
+// ── Result persistence ──────────────────────────────────────────────────────
+// Remembers whether today's quiz has already been played, so a page refresh
+// shows the same result screen instead of letting the person replay. Keyed
+// by quiz_number (not date) so archive pages each get their own independent
+// "already played" record, and results never collide across quiz types.
+function resultStorageKey() {
+    return `gawa_result_${QUIZ.quiz_number}`;
+}
+
+function saveResult(won) {
+    try {
+        localStorage.setItem(resultStorageKey(), JSON.stringify({
+            won,
+            revealed,
+            dotState,
+            debutOpponentLocked,
+            debutYearLocked,
+        }));
+    } catch (e) {}
+}
+
+function loadSavedResult() {
+    try {
+        const raw = localStorage.getItem(resultStorageKey());
+        if (!raw) return null;
+        return JSON.parse(raw);
+    } catch (e) {
+        return null;
+    }
 }
 
 // ── Streak ───────────────────────────────────────────────────────────────────
@@ -1317,6 +1622,13 @@ function share() {
             return '⬜';
         }).join('');
         scoreText = won ? 'Got the missing goalscorer!' : 'Didn\'t get the missing goalscorer';
+    } else if (IS_DEBUT) {
+        emoji = dotState.slice(0, Math.max(revealed, 1)).map(s => {
+            if (s === 'correct') return '🟢';
+            if (s === 'wrong')   return '🔴';
+            return '⬜';
+        }).join('');
+        scoreText = won ? 'Got the debut details!' : 'Didn\'t get the debut details';
     } else {
         emoji = dotState.slice(0, Math.max(revealed, 1)).map(s => {
             if (s === 'correct') return '🟢';
