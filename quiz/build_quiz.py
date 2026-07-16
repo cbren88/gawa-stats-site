@@ -215,25 +215,20 @@ def main():
             log_label = player_name
 
         # Player names for autocomplete
-        # Filtering to names containing a space excludes surname-only entries
-        # (e.g. "Cathcart", "McNair") that TM's match-sheet pages often show
-        # without a first name — these aren't useful autocomplete suggestions
-        # on their own, and a fuller name for the same player is normally
-        # already present via one of the other two sources in this union.
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT DISTINCT full_name FROM rpt.dim_player
-                WHERE senior_caps >= 1 AND full_name IS NOT NULL AND full_name LIKE '% %'
+                WHERE senior_caps >= 1 AND full_name IS NOT NULL
 
                 UNION
 
                 SELECT DISTINCT player_name FROM stg.ni_lineup_positions
-                WHERE ni_side = TRUE AND player_name IS NOT NULL AND player_name LIKE '% %'
+                WHERE ni_side = TRUE AND player_name IS NOT NULL
 
                 UNION
 
                 SELECT DISTINCT player_name FROM stg.ni_fixture_players
-                WHERE ni_side = TRUE AND player_name IS NOT NULL AND player_name LIKE '% %'
+                WHERE ni_side = TRUE AND player_name IS NOT NULL
 
                 ORDER BY 1
             """)
