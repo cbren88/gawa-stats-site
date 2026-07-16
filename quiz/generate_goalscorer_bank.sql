@@ -6,7 +6,7 @@
 
 INSERT INTO ctrl.quiz_questions (
     question_type, fixture_info,
-    goalscorer_match_id, goalscorer_data, missing_tm_player_id
+    goalscorer_match_id, goalscorer_data, missing_tm_player_id, missing_goal_sequence
 )
 WITH eligible_fixtures AS (
     -- Fixtures with at least 1 NI goal (own goals excluded)
@@ -53,10 +53,15 @@ goal_rows AS (
     WHERE g.is_own_goal = FALSE
 ),
 missing_pick AS (
-    -- One random NI goal per fixture to be the blanked answer
+    -- One random NI GOAL EVENT per fixture to be the blanked answer.
+    -- Keyed on goal_sequence (not just tm_player_id), since a player who
+    -- scored more than once in the match must only have ONE of their goals
+    -- blanked — matching on player_id alone would blank every goal they
+    -- scored, wrongly hiding all of them instead of just the chosen one.
     SELECT DISTINCT ON (tm_match_id)
         tm_match_id,
-        tm_player_id AS missing_tm_player_id
+        tm_player_id AS missing_tm_player_id,
+        goal_sequence AS missing_goal_sequence
     FROM goal_rows
     WHERE ni_side = TRUE
     ORDER BY tm_match_id, random()
@@ -95,7 +100,7 @@ SELECT
                 jsonb_build_object(
                     'tm_player_id', gr.tm_player_id,
                     'player_name',
-                        CASE WHEN gr.tm_player_id = mp.missing_tm_player_id
+                        CASE WHEN gr.goal_sequence = mp.missing_goal_sequence
                              THEN NULL
                              ELSE gr.player_name
                         END,
@@ -116,6 +121,7 @@ SELECT
             WHERE gr.tm_match_id = fm.tm_match_id AND gr.ni_side = FALSE
         )
     ) AS goalscorer_data,
-    mp.missing_tm_player_id
+    mp.missing_tm_player_id,
+    mp.missing_goal_sequence
 FROM fixture_meta fm
 JOIN missing_pick mp ON mp.tm_match_id = fm.tm_match_id;

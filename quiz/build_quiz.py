@@ -66,6 +66,11 @@ def main():
                     q.goalscorer_match_id,
                     q.goalscorer_data,
                     q.missing_tm_player_id,
+                    q.missing_goal_sequence,
+                    q.debut_tm_player_id,
+                    q.debut_opponent,
+                    q.debut_year,
+                    q.debut_tm_match_id,
                     COALESCE(
                         p.transfermarkt_url,
                         CASE WHEN q.tm_player_id IS NOT NULL
@@ -77,7 +82,10 @@ def main():
                     END AS match_url,
                     CASE WHEN q.goalscorer_match_id IS NOT NULL
                          THEN 'https://www.transfermarkt.co.uk/spielbericht/index/spielbericht/' || q.goalscorer_match_id
-                    END AS goalscorer_match_url
+                    END AS goalscorer_match_url,
+                    CASE WHEN q.debut_tm_match_id IS NOT NULL
+                         THEN 'https://www.transfermarkt.co.uk/spielbericht/index/spielbericht/' || q.debut_tm_match_id
+                    END AS debut_match_url
                 FROM ctrl.quiz_questions q
                 LEFT JOIN rpt.dim_player p ON p.tm_player_id = q.tm_player_id
                 WHERE q.used_date = %s
@@ -90,8 +98,9 @@ def main():
         (quiz_number, question_type, tm_player_id, player_name,
          clues, fixture_info, lineup_json, missing_player,
          missing_pitch_top, missing_pitch_left, source_fixture_id,
-         goalscorer_match_id, goalscorer_data, missing_tm_player_id,
-         tm_url, match_url, goalscorer_match_url) = row
+         goalscorer_match_id, goalscorer_data, missing_tm_player_id, missing_goal_sequence,
+         debut_tm_player_id, debut_opponent, debut_year, debut_tm_match_id,
+         tm_url, match_url, goalscorer_match_url, debut_match_url) = row
 
         # Get prev/next quiz dates for navigation
         with conn.cursor() as cur:
@@ -175,17 +184,51 @@ def main():
                     )
 
             quiz_data = {
-                "quiz_number":          quiz_number,
-                "question_type":        "missing_goalscorer",
-                "player_name":          missing_scorer_name or "",
-                "missing_tm_player_id": missing_tm_player_id,
-                "goalscorer_data":      goalscorer_data,
-                "transfermarkt_url":    missing_scorer_url or "",
-                "match_url":            goalscorer_match_url or "",
-                "quiz_date":            target_date,
-                "prev_date":            prev_date,
-                "next_date":            next_date,
-                "is_today":             is_today,
+                "quiz_number":            quiz_number,
+                "question_type":          "missing_goalscorer",
+                "player_name":            missing_scorer_name or "",
+                "missing_tm_player_id":   missing_tm_player_id,
+                "missing_goal_sequence":  missing_goal_sequence,
+                "goalscorer_data":        goalscorer_data,
+                "transfermarkt_url":      missing_scorer_url or "",
+                "match_url":              goalscorer_match_url or "",
+                "quiz_date":              target_date,
+                "prev_date":              prev_date,
+                "next_date":              next_date,
+                "is_today":               is_today,
+            }
+        elif question_type == 'debut_details':
+            # player_name is already populated directly on this row by
+            # generate_debut_bank.sql, so no name-fallback lookup is needed
+            # here — only the TM profile URL, since debut_tm_player_id is a
+            # separate column from tm_player_id (used by who_am_i) and isn't
+            # covered by the main query's transfermarkt_url join above.
+            debut_scorer_url = None
+            if debut_tm_player_id:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        SELECT transfermarkt_url FROM rpt.dim_player
+                        WHERE tm_player_id = %s
+                    """, (debut_tm_player_id,))
+                    found = cur.fetchone()
+                debut_scorer_url = (
+                    found[0] if found and found[0]
+                    else 'https://www.transfermarkt.co.uk/-/profil/spieler/' + debut_tm_player_id
+                )
+
+            quiz_data = {
+                "quiz_number":        quiz_number,
+                "question_type":      "debut_details",
+                "player_name":        player_name,
+                "debut_tm_player_id": debut_tm_player_id,
+                "debut_opponent":     debut_opponent,
+                "debut_year":         debut_year,
+                "transfermarkt_url":  debut_scorer_url or "",
+                "match_url":          debut_match_url or "",
+                "quiz_date":          target_date,
+                "prev_date":          prev_date,
+                "next_date":          next_date,
+                "is_today":           is_today,
             }
         else:
             quiz_data = {
@@ -239,9 +282,24 @@ def main():
             """)
             player_names = [r[0] for r in cur.fetchall()]
 
+        # Opponent/team names for the debut_details autocomplete — every
+        # distinct national team NI have faced, excluding NI themselves.
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT DISTINCT team FROM (
+                    SELECT home_team AS team FROM stg.ni_fixtures
+                    UNION
+                    SELECT away_team AS team FROM stg.ni_fixtures
+                ) t
+                WHERE team IS NOT NULL AND LOWER(team) NOT LIKE '%northern ireland%'
+                ORDER BY 1
+            """)
+            team_names = [r[0] for r in cur.fetchall()]
+
     html = TEMPLATE.read_text(encoding="utf-8")
     html = html.replace("__QUIZ_DATA__",    json.dumps(quiz_data,    ensure_ascii=False))
     html = html.replace("__PLAYER_NAMES__", json.dumps(player_names, ensure_ascii=False))
+    html = html.replace("__TEAM_NAMES__",   json.dumps(team_names,   ensure_ascii=False))
 
     # Always save to archive
     ARCHIVE.mkdir(exist_ok=True)
@@ -256,6 +314,7 @@ def main():
         print(f"  Output: {OUTPUT}")
 
     print(f"  Players in autocomplete: {len(player_names)}")
+    print(f"  Teams in autocomplete: {len(team_names)}")
 
     if is_today:
         result = os.system(
