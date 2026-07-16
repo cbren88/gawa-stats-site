@@ -127,6 +127,14 @@ def main():
             # until solved), but we need it server-side for guess-checking
             # and for the post-game reveal links, same pattern as missing_lineup.
             # missing_tm_player_id is always an NI scorer (see generate_goalscorer_bank.sql).
+            #
+            # rpt.dim_player only covers SportAPI-sourced players (current/recent
+            # squads with a richer profile) — historical players scraped only via
+            # Transfermarkt (e.g. David Healy, retired before the SportAPI
+            # integration existed) have no row there at all. Fall back to
+            # stg.ni_fixture_players.player_name, which is guaranteed to have an
+            # entry for anyone who appears in a scraped match, since that's the
+            # actual source the name was captured from originally.
             missing_scorer_name = None
             missing_scorer_url  = None
             if missing_tm_player_id:
@@ -141,6 +149,24 @@ def main():
                         WHERE tm_player_id = %s
                     """, (missing_tm_player_id, missing_tm_player_id))
                     found = cur.fetchone()
+
+                if not found:
+                    with conn.cursor() as cur:
+                        cur.execute("""
+                            SELECT player_name
+                            FROM stg.ni_fixture_players
+                            WHERE tm_player_id = %s
+                              AND player_name IS NOT NULL
+                            ORDER BY LENGTH(player_name) DESC, scraped_at DESC
+                            LIMIT 1
+                        """, (missing_tm_player_id,))
+                        fallback = cur.fetchone()
+                    if fallback:
+                        found = (
+                            fallback[0],
+                            'https://www.transfermarkt.co.uk/-/profil/spieler/' + missing_tm_player_id,
+                        )
+
                 if found:
                     missing_scorer_name, missing_scorer_url = found
                 else:
@@ -189,15 +215,25 @@ def main():
             log_label = player_name
 
         # Player names for autocomplete
+        # Filtering to names containing a space excludes surname-only entries
+        # (e.g. "Cathcart", "McNair") that TM's match-sheet pages often show
+        # without a first name — these aren't useful autocomplete suggestions
+        # on their own, and a fuller name for the same player is normally
+        # already present via one of the other two sources in this union.
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT DISTINCT full_name FROM rpt.dim_player
-                WHERE senior_caps >= 1 AND full_name IS NOT NULL
+                WHERE senior_caps >= 1 AND full_name IS NOT NULL AND full_name LIKE '% %'
 
                 UNION
 
                 SELECT DISTINCT player_name FROM stg.ni_lineup_positions
-                WHERE ni_side = TRUE AND player_name IS NOT NULL
+                WHERE ni_side = TRUE AND player_name IS NOT NULL AND player_name LIKE '% %'
+
+                UNION
+
+                SELECT DISTINCT player_name FROM stg.ni_fixture_players
+                WHERE ni_side = TRUE AND player_name IS NOT NULL AND player_name LIKE '% %'
 
                 ORDER BY 1
             """)
