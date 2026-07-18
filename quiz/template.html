@@ -7,6 +7,7 @@
     <meta name="description" content="Daily Northern Ireland football quiz. Can you guess today's player or missing lineup?">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
             --pitch:       #FFFFFF;
@@ -630,9 +631,181 @@
             .clue-item { animation: none; }
             .dot, .player-token.missing .player-dot { transition: none; animation: none; }
         }
+
+        /* ── Social links (matches gawa-stats.com) ── */
+        .social-links {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .social-links a {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--green-mid);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 19px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .social-links a:hover {
+            transform: scale(1.08);
+            background: var(--green);
+        }
+
+        @media (max-width: 480px) {
+            .social-links { right: 12px; bottom: 12px; }
+            .social-links a { width: 40px; height: 40px; font-size: 17px; }
+        }
+
+        /* ── Welcome modal (first visit) ── */
+        .welcome-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 30, 24, 0.55);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .welcome-overlay.open { display: flex; }
+
+        .welcome-modal {
+            background: #ffffff;
+            border-radius: 16px;
+            max-width: 460px;
+            width: 100%;
+            padding: 32px 28px 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .welcome-eyebrow {
+            font-family: Candara, 'Trebuchet MS', sans-serif;
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: var(--green);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .welcome-title {
+            font-family: Candara, 'Trebuchet MS', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #111111;
+            margin-bottom: 20px;
+        }
+
+        .welcome-item {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            background: var(--clue-bg);
+            border-left: 3px solid var(--green);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+        }
+
+        .welcome-item-icon { font-size: 22px; line-height: 1.3; }
+        .welcome-item-title { font-weight: 700; color: #111111; }
+        .welcome-item-desc { color: var(--text); font-size: 14px; margin-top: 2px; line-height: 1.4; }
+
+        .welcome-note {
+            color: var(--muted);
+            font-size: 13.5px;
+            line-height: 1.5;
+            margin: 18px 0 22px;
+        }
+
+        .welcome-cta {
+            display: block;
+            width: 100%;
+            background: var(--green-mid);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .welcome-cta:hover { background: var(--green); }
+
+        @media (max-width: 480px) {
+            .welcome-modal { padding: 26px 20px 22px; }
+            .welcome-title { font-size: 24px; }
+        }
     </style>
 </head>
 <body>
+
+<div class="welcome-overlay" id="welcomeOverlay">
+    <div class="welcome-modal">
+        <div class="welcome-eyebrow">GAWA-STATS</div>
+        <div class="welcome-title">Welcome to GAWA Quiz</div>
+
+        <div class="welcome-item">
+            <div class="welcome-item-icon">🕵️</div>
+            <div>
+                <div class="welcome-item-title">Who Am I?</div>
+                <div class="welcome-item-desc">Reveal clues one at a time and guess the mystery NI player before you run out.</div>
+            </div>
+        </div>
+
+        <div class="welcome-item">
+            <div class="welcome-item-icon">⚽</div>
+            <div>
+                <div class="welcome-item-title">Missing Lineup</div>
+                <div class="welcome-item-desc">One player is missing from a real NI starting XI. Work out who's missing from the pitch.</div>
+            </div>
+        </div>
+
+        <div class="welcome-item">
+            <div class="welcome-item-icon">🥅</div>
+            <div>
+                <div class="welcome-item-title">Missing Goalscorer</div>
+                <div class="welcome-item-desc">One goalscorer from a real scoreline is hidden. Guess who scored it.</div>
+            </div>
+        </div>
+
+        <div class="welcome-item">
+            <div class="welcome-item-icon">🗓️</div>
+            <div>
+                <div class="welcome-item-title">Debut Details</div>
+                <div class="welcome-item-desc">Guess the year and opponent of a real NI player's senior debut.</div>
+            </div>
+        </div>
+
+        <div class="welcome-note">
+            A new quiz mode rotates in daily. Build a streak by playing every day, and share your result when you're done.
+        </div>
+
+        <button class="welcome-cta" id="welcomeCta">Let's play →</button>
+    </div>
+</div>
+
+<div class="social-links">
+    <a href="mailto:admin@gawa-stats.com?subject=GAWA%20Quiz%20Feedback" title="Email">
+        <i class="fa-solid fa-envelope"></i>
+    </a>
+    <a href="https://x.com/GAWA_stats" target="_blank" rel="noopener" title="Follow on X">
+        <i class="fa-brands fa-x-twitter"></i>
+    </a>
+</div>
 
 <header>
     <div class="eyebrow">GAWA-Stats</div>
@@ -904,13 +1077,34 @@ function setupNavigation() {
         prevBtn.classList.add('invisible');
     }
 
-    // Next button — every date (including today) always has a copy saved
-    // under /archive/, so the path itself doesn't need special-casing here;
-    // only whether to show/hide it depends on whether this really is today.
+    // Next button — QUIZ.next_date is frozen at BUILD time, same trap the
+    // comment above describes for is_today. Every archive page was once
+    // "today" itself, and on that day tomorrow genuinely didn't exist yet,
+    // so next_date got baked in as null forever — meaning every archived
+    // page's Next button died permanently the moment it was created, even
+    // though the following day's quiz obviously exists by the time anyone
+    // is actually browsing archives. Fix: compute the next calendar date
+    // live from quiz_date instead of trusting the frozen field, exactly
+    // like isCurrentDate/isArchivePage already do above.
+    function addOneDay(dateStr) {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const dt = new Date(Date.UTC(y, m - 1, d));
+        dt.setUTCDate(dt.getUTCDate() + 1);
+        return dt.toISOString().slice(0, 10);
+    }
+
     const nextBtn = document.getElementById('nextBtn');
-    if (nextDate) {
-        const nextUrl = isCurrentDate ? '#' : `${nextDate}.html`;
-        nextBtn.href = nextUrl;
+    if (isArchivePage) {
+        // Looking back at history, there is always a "day after" - either
+        // another archive page, or today's live quiz.
+        const computedNextDate = addOneDay(QUIZ.quiz_date);
+        nextBtn.href = computedNextDate === todayStr
+            ? '../index.html'
+            : `${computedNextDate}.html`;
+    } else if (nextDate) {
+        // Live/root page - unchanged behaviour: only relevant if this tab
+        // has gone stale (still open from a previous day).
+        nextBtn.href = isCurrentDate ? '#' : `./archive/${nextDate}.html`;
         if (isCurrentDate) nextBtn.classList.add('invisible');
     } else {
         nextBtn.classList.add('invisible');
@@ -923,6 +1117,28 @@ function setupNavigation() {
         banner.style.display = 'block';
     }
 }
+
+// ── Welcome modal (first visit only) ─────────────────────────────────────────
+// Shows once per browser, globally - not scoped per quiz/page - so someone
+// who's already seen it on today's quiz won't see it again on an archive
+// page. (Production currently shows it fresh on every archive page it seems
+// - if that's actually the behaviour you want kept, this is the one place
+// to change: scope SEEN_KEY by QUIZ.quiz_number instead of using one fixed
+// key, the same way resultStorageKey() does further down.)
+(function initWelcomeModal() {
+    const SEEN_KEY = 'gawa_welcome_seen';
+    let seen = false;
+    try { seen = localStorage.getItem(SEEN_KEY) === '1'; } catch (e) {}
+
+    if (!seen) {
+        const overlay = document.getElementById('welcomeOverlay');
+        overlay.classList.add('open');
+        document.getElementById('welcomeCta').addEventListener('click', () => {
+            overlay.classList.remove('open');
+            try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) {}
+        });
+    }
+})();
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
 setupNavigation();
