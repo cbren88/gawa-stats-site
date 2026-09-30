@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GAWA Stats – Opposition Analysis</title>
+
+  <link rel="icon" type="image/png" href="/favicon.png">
+
+  <!-- Open Graph / Social Preview -->
+  <meta property="og:title" content="GAWA Stats – Opposition Analysis" />
+  <meta property="og:description" content="Northern Ireland international opposition: squad form, key players and top-5 league players" />
+  <meta property="og:image" content="https://gawa-stats.com/images/GAWA-stats-logo.png" />
+  <meta property="og:url" content="https://gawa-stats.com/opposition" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="GAWA Stats – Opposition Analysis" />
+  <meta name="twitter:description" content="Northern Ireland international opposition: squad form, key players and top-5 league players" />
+  <meta name="twitter:image" content="https://gawa-stats.com/images/GAWA-stats-logo.png" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <style>
+    body {
+      margin: 0;
+      background: #0f172a;
+      font-family: Arial, sans-serif;
+    }
+
+    /* The report page is a tall 1080 x 1820 canvas, so the frame keeps that
+       aspect ratio (plus Power BI's ~40px footer bar) and the page scrolls,
+       instead of squashing the report into one screen height. */
+    .frame {
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto;
+      aspect-ratio: 1080 / 1860;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .social-links {
+      position: fixed;
+      right: 20px;
+      bottom: 90px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .social-links a {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      font-size: 22px;
+      backdrop-filter: blur(6px);
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    }
+
+    .social-links a:hover {
+      transform: scale(1.08);
+      background: rgba(30, 41, 59, 0.95);
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="frame">
+  <iframe
+    title="GAWA Stats – Opposition Analysis"
+    src="https://app.powerbi.com/view?r=eyJrIjoiOWY2ZDAwNDEtYzkyNS00YjY0LWE5MzQtOWYzMDY4ODlhMTUwIiwidCI6IjdhMTUzMWQzLWQ2MWItNGEyOS1hYWRkLTlmYjg5YzA0Njg1ZiJ9"
+    allowfullscreen>
+  </iframe>
+</div>
+
+<div class="social-links">
+  <a href="mailto:admin@gawa-stats.com?subject=GAWA%20Stats%20Feedback" title="Email">
+    <i class="fa-solid fa-envelope"></i>
+  </a>
+  <a href="https://x.com/GAWA_stats" target="_blank" title="Follow on X">
+    <i class="fa-brands fa-x-twitter"></i>
+  </a>
+</div>
+
+</body>
+</html>
